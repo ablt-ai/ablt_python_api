@@ -19,7 +19,7 @@ import pytest
 from aiohttp import client_exceptions
 
 from src.ablt_python_api.ablt_api_async import ABLTApi
-from .test_data import sslcontext, KEY_LENGTH
+from tests.test_data import sslcontext, KEY_LENGTH
 
 
 def test_async_constructor_without_token():

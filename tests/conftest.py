@@ -21,5 +21,10 @@ from .test_data import sslcontext
 
 @pytest.fixture(scope="session")
 def api():
-    """This fixture returns ABLTApi instance."""
+    """
+    This fixture returns ABLTApi instance.
+
+    :return: ABLTApi instance
+    :rtype: ABLTApi
+    """
     return ABLTApi(bearer_token=environ["BEARER_TOKEN"], ssl_context=sslcontext)

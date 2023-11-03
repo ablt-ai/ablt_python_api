@@ -23,9 +23,7 @@ from .utils.logger_config import setup_logger
 
 
 class ABLTApi:
-    """
-    aBLT Chat API master class
-    """
+    """aBLT Chat API master class"""
 
     def __init__(
         self,

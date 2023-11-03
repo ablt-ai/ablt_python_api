@@ -13,9 +13,10 @@ This file contains an configuration for loggers.
 import logging
 import os
 import sys
+from typing import Optional
 
 
-def setup_logger(name: str, log_file: str = None, level: int = logging.DEBUG):
+def setup_logger(name: str, log_file: Optional[str] = None, level: int = logging.DEBUG):
     """
     Function to setup as many loggers as you want
 

@@ -16,7 +16,7 @@ from random import choice
 import pytest
 
 from src.ablt_python_api.utils.exceptions import DoneException
-from .test_data import sample_questions, unique_models, MIN_WORDS
+from tests.test_data import sample_questions, unique_models, MIN_WORDS
 
 
 @pytest.mark.asyncio
