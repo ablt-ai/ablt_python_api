@@ -15,6 +15,7 @@ import asyncio
 import json
 import logging
 from time import sleep
+from typing import Optional
 
 import aiohttp
 
@@ -29,7 +30,7 @@ class ABLTApi:
         self,
         bearer_token: str,
         base_api_url: str = "https://api.ablt.ai",
-        logger: logging.Logger = None,
+        logger: Optional[logging.Logger] = None,
         ssl_context=None,
     ):
         """
