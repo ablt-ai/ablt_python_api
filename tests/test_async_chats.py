@@ -15,8 +15,8 @@ from random import choice
 
 import pytest
 
-from tests.test_data import sample_questions, unique_models
 from src.ablt_python_api.utils.exceptions import DoneException
+from tests.test_data import sample_questions, unique_models
 
 
 @pytest.mark.asyncio
