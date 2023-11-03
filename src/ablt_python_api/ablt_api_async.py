@@ -266,7 +266,7 @@ class ABLTApi:
                             for error in error_data["detail"]:
                                 if error.get("msg") and error.get("type") and error.get("loc"):
                                     self.__logger.error(
-                                        f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
+                                        "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
                                     )
                                 else:
                                     self.__logger.error("  - %s", error)

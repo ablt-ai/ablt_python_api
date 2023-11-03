@@ -27,4 +27,4 @@ jobs:
         pip install -r requirements.txt
     - name: Execute tests
       id: tests
-      run: pytest tests -vv -rfEx --tb=short -p no:warnings
+      run: PYTHONPATH=. pytest tests -vv -rfEx --tb=short -p no:warnings -n=16
