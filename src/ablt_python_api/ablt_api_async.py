@@ -27,8 +27,13 @@ class ABLTApi:
     aBLT Chat API master class
     """
 
-    def __init__(self, bearer_token: str, base_api_url: str = 'https://api.ablt.ai', logger: logging.Logger = None,
-                 ssl_context=None):
+    def __init__(
+        self,
+        bearer_token: str,
+        base_api_url: str = "https://api.ablt.ai",
+        logger: logging.Logger = None,
+        ssl_context=None,
+    ):
         """
         Initializes the object with the provided base API URL and bearer token.
 
@@ -97,7 +102,7 @@ class ABLTApi:
                         self.__logger.error("Error details:")
                         for error in data["detail"]:
                             self.__logger.error(
-                                f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
+                                "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
                             )
                     except ValueError:
                         self.__logger.error("Error text: %s", response.text)
@@ -109,7 +114,7 @@ class ABLTApi:
                         self.__logger.error("Error details:")
                         for error in error_data["detail"]:
                             self.__logger.error(
-                                f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
+                                "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
                             )
                     except ValueError:
                         self.__logger.error("Error text: %s", response.text)
@@ -131,27 +136,26 @@ class ABLTApi:
                 if response.status == 200:
                     data = await response.json()
                     return data
-                else:
-                    self.__logger.error("Request error: %s", response.status)
-                    try:
-                        error_data = await response.json()
-                        self.__logger.error("Error details: %s", error_data)
-                    except ValueError:
-                        self.__logger.error("Error text: %s", await response.text())
-                    return None
+                self.__logger.error("Request error: %s", response.status)
+                try:
+                    error_data = await response.json()
+                    self.__logger.error("Error details: %s", error_data)
+                except ValueError:
+                    self.__logger.error("Error text: %s", await response.text())
+                return None
 
     async def chat(
-            self,
-            bot_uid=None,
-            bot_slug=None,
-            prompt=None,
-            messages=None,
-            stream=False,
-            user=None,
-            language=None,
-            assumptions=None,
-            max_words=None,
-            use_search=False,
+        self,
+        bot_uid=None,
+        bot_slug=None,
+        prompt=None,
+        messages=None,
+        stream=False,
+        user=None,
+        language=None,
+        assumptions=None,
+        max_words=None,
+        use_search=False,
     ):
         """
         Sends a chat request to the API and returns the response.
@@ -191,15 +195,11 @@ class ABLTApi:
           their values are not of the correct type, the function will print an error message and return None.
         """
         if (not prompt and not messages) or (prompt and messages):
-            self.__logger.error(
-                "Error: Only one param is required ('prompt' or 'messages')"
-            )
+            self.__logger.error("Error: Only one param is required ('prompt' or 'messages')")
             return
 
         if (not bot_slug and not bot_uid) or (bot_slug and bot_uid):
-            self.__logger.error(
-                "Error: Only one param is required ('bot_slug' or 'bot_uid')"
-            )
+            self.__logger.error("Error: Only one param is required ('bot_slug' or 'bot_uid')")
             return
 
         url, headers = self.__get_url_and_headers("v1/chat")
@@ -232,9 +232,7 @@ class ABLTApi:
                                             try:
                                                 message_data = json.loads(data)
                                             except json.JSONDecodeError:
-                                                self.__logger.error(
-                                                    "Seems json malformed %s", line
-                                                )
+                                                self.__logger.error("Seems json malformed %s", line)
                                                 continue
                                             content = message_data.get("content")
                                             message = message_data.get("message")
@@ -252,9 +250,7 @@ class ABLTApi:
                         elif "content" in response_json:
                             message = response_json["content"]
                         else:
-                            self.__logger.error(
-                                f"Response malformed! Actual response is: {response_json}"
-                            )
+                            self.__logger.error("Response malformed! Actual response is: %s", response_json)
                             return
                         yield message
                 else:
@@ -264,7 +260,7 @@ class ABLTApi:
 
                         self.__logger.error("Error details:")
                         if isinstance(error_data["detail"], str):
-                            self.__logger.error("  - %s", error_data['detail'])
+                            self.__logger.error("  - %s", error_data["detail"])
                         else:
                             for error in error_data["detail"]:
                                 if error.get("msg") and error.get("type") and error.get("loc"):
@@ -292,16 +288,12 @@ class ABLTApi:
         while retries <= 10:
             if not await self.health_check():
                 retries += 1
-                self.__logger.warning(
-                    f"WARNING: Seems something nasty happened with aBLT api, trying {retries}/10"
-                )
+                self.__logger.warning("WARNING: Seems something nasty happened with aBLT api, trying %s/10", retries)
                 sleep(5)
             else:
                 break
         if retries >= 10:
-            raise ConnectionError(
-                "ERROR: Connection to aBLT API couldn't be established"
-            )
+            raise ConnectionError("ERROR: Connection to aBLT API couldn't be established")
 
     async def set_base_api_url(self, new_base_api_url, instant_update=False):
         """
@@ -452,14 +444,13 @@ class ABLTApi:
                 if response.status == 200:
                     data = await response.json()
                     return data
-                else:
-                    self.__logger.error("Request error: %s", response.status)
-                    try:
-                        error_data = await response.json()
-                        self.__logger.error("Error details: %s", error_data)
-                    except ValueError:
-                        self.__logger.error("Error text: %s", await response.text())
-                    return None
+                self.__logger.error("Request error: %s", response.status)
+                try:
+                    error_data = await response.json()
+                    self.__logger.error("Error details: %s", error_data)
+                except ValueError:
+                    self.__logger.error("Error text: %s", await response.text())
+                return None
 
     async def get_statistics_for_a_day(self, day: str):
         """

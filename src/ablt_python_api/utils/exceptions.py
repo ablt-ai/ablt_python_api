@@ -14,8 +14,6 @@ This file contains any exception classes.
 class DoneException(Exception):
     """This class is dummy placeholder to raise exception to break endless stream responses (endless loop)"""
 
-    pass
-
 
 class CustomError(Exception):
     """This class is placeholder to raise exception for servers or standalone logging"""

@@ -24,6 +24,7 @@ from src.ablt_python_api.ablt_api_async import ABLTApi
 
 class TestAsyncConstructor:
     """This class tests for async constructor."""
+
     sslcontext = ssl.create_default_context()
     sslcontext.check_hostname = False
     sslcontext.verify_mode = ssl.CERT_NONE
@@ -50,16 +51,18 @@ class TestAsyncConstructor:
         :param caplog: caplog pytest fixture
         """
         caplog.set_level(INFO)
-        ABLTApi(bearer_token=secrets.token_hex(16), base_api_url="https://api.ablt.ai",
-                ssl_context=self.sslcontext)
+        ABLTApi(bearer_token=secrets.token_hex(16), base_api_url="https://api.ablt.ai", ssl_context=self.sslcontext)
         assert "Logger for API now launched!" in caplog.text
         assert "ABLT chat API is working like a charm" in caplog.text
 
     def test_async_constructor_default_init_with_invalid_url(self):
         """Test against constructor with invalid url."""
         with pytest.raises(client_exceptions.InvalidURL):
-            ABLTApi(bearer_token=secrets.token_hex(16), base_api_url=choice(("", secrets.token_hex(16))),
-                    ssl_context=self.sslcontext)
+            ABLTApi(
+                bearer_token=secrets.token_hex(16),
+                base_api_url=choice(("", secrets.token_hex(16))),
+                ssl_context=self.sslcontext,
+            )
 
     def test_async_constructor_default_init_with_incorrect_logger(self):
         """Test against constructor with incorrect logger."""
