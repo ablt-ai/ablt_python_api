@@ -11,12 +11,12 @@ Description:
 This file tests for async constructor.
 """
 
-import io
 import secrets
 import ssl
+from logging import INFO
 from random import choice
-from unittest.mock import patch
 
+import pytest
 from aiohttp import client_exceptions
 
 from src.ablt_python_api.ablt_api_async import ABLTApi
@@ -30,45 +30,38 @@ class TestAsyncConstructor:
 
     def test_async_constructor_without_token(self):
         """Test against constructor without token."""
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             ABLTApi()
 
-    @patch('sys.stdout', new_callable=io.StringIO)
-    def test_async_constructor_default_init_with_any_token(self, mock_stdout):
+    def test_async_constructor_default_init_with_any_token(self, caplog):
         """
         Test against constructor with any token.
 
-        :param mock_stdout: mock stdout
+        :param caplog: caplog pytest fixture
         """
-        with self.assertLogs('api', level='INFO') as captured:
-            ABLTApi(bearer_token=secrets.token_hex(16), ssl_context=self.sslcontext)
-        self.assertIn("Logger for API now launched!", mock_stdout.getvalue())
-        self.assertIn("ABLT chat API is working like a charm", mock_stdout.getvalue())
-        self.assertIn("Logger for API now launched!", captured.output[0])
-        self.assertIn("ABLT chat API is working like a charm", captured.output[1])
+        ABLTApi(bearer_token=secrets.token_hex(16), ssl_context=self.sslcontext)
+        assert "Logger for API now launched!" in caplog.text
+        assert "ABLT chat API is working like a charm" in caplog.text
 
-    @patch('sys.stdout', new_callable=io.StringIO)
-    def test_async_constructor_default_init_with_any_token_and_valid_url(self, mock_stdout):
+    def test_async_constructor_default_init_with_any_token_and_valid_url(self, caplog):
         """
         Test against constructor with any token and valid url.
 
-        :param mock_stdout: mock stdout
+        :param caplog: caplog pytest fixture
         """
-        with self.assertLogs('api', level='INFO') as captured:
-            ABLTApi(bearer_token=secrets.token_hex(16), base_api_url="https://api.ablt.ai",
-                    ssl_context=self.sslcontext)
-        self.assertIn("Logger for API now launched!", mock_stdout.getvalue())
-        self.assertIn("ABLT chat API is working like a charm", mock_stdout.getvalue())
-        self.assertIn("Logger for API now launched!", captured.output[0])
-        self.assertIn("ABLT chat API is working like a charm", captured.output[1])
+        caplog.set_level(INFO)
+        ABLTApi(bearer_token=secrets.token_hex(16), base_api_url="https://api.ablt.ai",
+                ssl_context=self.sslcontext)
+        assert "Logger for API now launched!" in caplog.text
+        assert "ABLT chat API is working like a charm" in caplog.text
 
     def test_async_constructor_default_init_with_invalid_url(self):
         """Test against constructor with invalid url."""
-        with self.assertRaises(client_exceptions.InvalidURL):
+        with pytest.raises(client_exceptions.InvalidURL):
             ABLTApi(bearer_token=secrets.token_hex(16), base_api_url=choice(("", secrets.token_hex(16))),
                     ssl_context=self.sslcontext)
 
     def test_async_constructor_default_init_with_incorrect_logger(self):
         """Test against constructor with incorrect logger."""
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             ABLTApi(bearer_token=secrets.token_hex(16), logger=secrets.token_hex(16), ssl_context=self.sslcontext)

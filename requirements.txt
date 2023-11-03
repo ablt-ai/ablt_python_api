@@ -3,3 +3,4 @@ asyncio==3.4.3
 requests==2.31.0
 pytest==7.4.3
 pytest-asyncio==0.21.1
+pytest-xdist==3.3.1

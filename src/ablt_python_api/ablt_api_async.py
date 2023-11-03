@@ -263,11 +263,18 @@ class ABLTApi:
                     self.__logger.error(f"Error: {response.status}")
                     try:
                         error_data = await response.json()
+
                         self.__logger.error("Error details:")
-                        for error in error_data["detail"]:
-                            self.__logger.error(
-                                f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
-                            )
+                        if isinstance(error_data["detail"], str):
+                            self.__logger.error(f"  - {error_data['detail']}")
+                        else:
+                            for error in error_data["detail"]:
+                                if error.get("msg") and error.get("type") and error.get("loc"):
+                                    self.__logger.error(
+                                        f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
+                                    )
+                                else:
+                                    self.__logger.error(f"  - {error}")
                     except ValueError:
                         error_text = await response.text()
                         self.__logger.error(f"Error text: {error_text}")

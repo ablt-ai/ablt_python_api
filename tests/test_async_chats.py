@@ -14,9 +14,11 @@ This file tests for async chats.
 import pytest
 from os import environ
 import ssl
+from random import choice
 
 
 from src.ablt_python_api.ablt_api_async import ABLTApi
+from tests.test_data import sample_questions, unique_models
 
 
 class TestAsyncChats:
@@ -27,12 +29,15 @@ class TestAsyncChats:
     api = ABLTApi(bearer_token=environ['BEARER_TOKEN'], ssl_context=sslcontext)
 
     @pytest.mark.asyncio
-    async def test_async_chats_general(self):
+    @pytest.mark.parametrize("bot_slug", unique_models)
+    async def test_async_chats_general(self, bot_slug):
         """This method tests for async chats."""
-        async_generator = self.api.chat(bot_slug='llama2-13-b-anyscale', prompt='Who is current president of US?',
-                                        max_words=3)
+        max_words = 3
+        async_generator = self.api.chat(bot_slug=bot_slug, prompt=choice(sample_questions), max_words=max_words,
+                                        stream=False)
         try:
             response = await async_generator.__anext__()
         except StopAsyncIteration:
             response = None
+        print(response)
         assert response is not None
