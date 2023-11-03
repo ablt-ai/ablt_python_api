@@ -27,7 +27,8 @@ def api():
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("bot_slug,stream", unique_models, (False, True))
+@pytest.mark.parametrize("bot_slug", unique_models, ids=unique_models)
+@pytest.mark.parametrize("stream", (False, True), ids=("not_stream", "stream"))
 async def test_async_chats_unique_models(api, bot_slug, stream):
     """
     This method tests for async chats (with/without stream) for unique models.
