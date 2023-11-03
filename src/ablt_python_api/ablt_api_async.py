@@ -14,6 +14,7 @@ This file contains an implementation of class for aBLT chat API.
 import asyncio
 import json
 import logging
+import ssl
 from time import sleep
 from typing import Optional
 
@@ -31,7 +32,7 @@ class ABLTApi:
         bearer_token: str,
         base_api_url: str = "https://api.ablt.ai",
         logger: Optional[logging.Logger] = None,
-        ssl_context=None,
+        ssl_context: Optional[ssl.SSLContext] = None,
     ):
         """
         Initializes the object with the provided base API URL and bearer token.
