@@ -82,16 +82,13 @@ class ABLTApi:
         """
         Performs a health check on the API.
 
-        Args:
-        - None
-
-        Returns:
-        - bool: True if the API status is 'ok', False otherwise
+        :return: True if the API status is 'ok', False otherwise.
+        :rtype: bool
         """
         url, headers = self.__get_url_and_headers("health-check")
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
-                if response.status == 200:
+                if response.status == 200:  # flake8: noqa
                     data = await response.json()
                     if data.get("status") == "ok":
                         self.__logger.info("ABLT chat API is working like a charm")
@@ -111,9 +108,12 @@ class ABLTApi:
                     try:
                         error_data = await response.json()
                         self.__logger.error("Error details:")
-                        for error in error_data["detail"]:
+                        for original_error in error_data["detail"]:
                             self.__logger.error(
-                                "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
+                                "  - %s (type: %s, location: %s)",
+                                original_error["msg"],
+                                original_error["type"],
+                                original_error["loc"],
                             )
                     except ValueError:
                         self.__logger.error("Error text: %s", response.text)
@@ -123,18 +123,14 @@ class ABLTApi:
         """
         Retrieves all published bots.
 
-        Args:
-        - None
-
-        Returns:
-        - list: A list of dictionaries containing bot information, or an empty list if an error occurs
+        :return: A list of dictionaries containing bot information, or an empty list if an error occurs.
+        :rtype: list
         """
         url, headers = self.__get_url_and_headers("v1/bots")
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    return data
+                if response.status == 200:  # flake8: noqa
+                    return await response.json()
                 self.__logger.error("Request error: %s", response.status)
                 try:
                     error_data = await response.json()
@@ -183,10 +179,10 @@ class ABLTApi:
         :type use_search: bool
         :return: The response message from the bot or None in case of an error.
         :rtype: yield
+        :raises DoneException: If the bot is done with the conversation.
 
         Important: Only one of the parameters 'prompt' or 'messages' should be provided.
                    Only one of the parameters 'bot_uid' or 'bot_slug' should be provided.
-
 
         Errors:
         - If both 'prompt' and 'messages' parameters are missing or provided simultaneously, the function
@@ -203,7 +199,7 @@ class ABLTApi:
             return
 
         url, headers = self.__get_url_and_headers("v1/chat")
-        data = {
+        payload = {
             "stream": stream,
             "use_search": use_search,
             **({"bot_slug": bot_slug} if bot_slug is not None else {}),
@@ -217,8 +213,8 @@ class ABLTApi:
         }
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, json=data, ssl=self.__ssl_context) as response:
-                if response.status == 200:
+            async with session.post(url, headers=headers, json=payload, ssl=self.__ssl_context) as response:
+                if response.status == 200:  # flake8: noqa
                     if stream:
                         try:
                             async for line in response.content.iter_any():
@@ -278,11 +274,7 @@ class ABLTApi:
         """
         Updates the API by calling the health_check function.
 
-        Args:
-        - None
-
-        Returns:
-        - None
+        :raise ConnectionError: If the health_check function fails 10 times in a row.
         """
         retries = 0
         while retries <= 10:
@@ -299,12 +291,10 @@ class ABLTApi:
         """
         Sets a new base API URL.
 
-        Args:
-        - new_base_api_url (str): The new base API URL as a string.
-        - instant_update (bool): A boolean indicating whether to instantly update the API or not. Default is False.
-
-        Returns:
-        - None
+        :param new_base_api_url: The new base API URL as a string.
+        :type new_base_api_url: str
+        :param instant_update: A boolean indicating whether to instantly update the API or not. Default is False.
+        :type instant_update: bool
         """
         self.__base_api_url = new_base_api_url
         if instant_update:
@@ -314,14 +304,10 @@ class ABLTApi:
         """
         Sets a new bearer token.
 
-        - new_bearer_token (str): The new bearer token as a string.
-        - instant_update (bool): A boolean indicating whether to instantly update the API or not. Default is False.
-
-        Args:
-        - None
-
-        Returns:
-        - None
+        :param new_bearer_token: The new bearer token as a string.
+        :type new_bearer_token: str
+        :param instant_update: A boolean indicating whether to instantly update the API or not. Default is False.
+        :type instant_update: bool
         """
         self.__bearer_token = new_bearer_token
         if instant_update:
@@ -331,14 +317,12 @@ class ABLTApi:
         """
         Updates the API information with new bearer token and/or new base API URL.
 
+        :param new_bearer_token: The new bearer token as a string, if any. Default is None.
+        :type new_bearer_token: str
+        :param new_base_api_url: The new base API URL as a string, if any. Default is None.
+        :type new_base_api_url: str
         - new_bearer_token (str): The new bearer token as a string, if any. Default is None.
         - new_base_api_url (bool): The new base API URL as a string, if any. Default is None.
-
-        Args:
-        - None
-
-        Returns:
-        - None
         """
         if new_bearer_token:
             await self.set_bearer_token(new_bearer_token)
@@ -350,11 +334,8 @@ class ABLTApi:
         """
         Returns the current base API URL as a string.
 
-        Args:
-        - None
-
-        Returns:
-        - str: current base API URL
+        :return: The current base API URL as a string.
+        :rtype: str
         """
         return self.__base_api_url
 
@@ -362,11 +343,8 @@ class ABLTApi:
         """
         Returns the current bearer token as a string.
 
-        Args:
-        - None
-
-        Returns:
-        - str: current bearer token
+        :return: The current bearer token as a string.
+        :rtype: str
         """
         return self.__bearer_token
 
@@ -375,10 +353,8 @@ class ABLTApi:
         Sets logger for API
 
         Args:
-        - logger (logger): default logger
-
-        Returns:
-        - None
+        :param new_logger: new logger
+        :type new_logger: logger
         """
         self.__logger = new_logger
 
@@ -386,13 +362,11 @@ class ABLTApi:
         """
         Searches for a bot by its id in the bot list.
 
-        Args:
-        - bot_uid (str): The id of the bot to search for.
-
-        Returns:
-        - str: bot dict
+        :param bot_uid: The id of the bot to search for.
+        :type bot_uid: str
+        :return: bot dict
+        :rtype: dict
         """
-
         for bot_info in await self.get_bots():
             if bot_info.get("uid") == bot_uid:
                 return bot_info
@@ -402,13 +376,11 @@ class ABLTApi:
         """
         Searches for a bot by its slug in the bot list.
 
-        Args:
-        - bot_slug (str): The slug of the bot to search for.
-
-        Returns:
-        - str: bot dict
+        :param bot_slug: The slug of the bot to search for.
+        :type bot_slug: str
+        :return: bot dict
+        :rtype: dict
         """
-
         for bot_info in await self.get_bots():
             if bot_info.get("slug") == bot_slug:
                 return bot_info
@@ -418,13 +390,11 @@ class ABLTApi:
         """
         Searches for a bot by its name in the bot list.
 
-        Args:
-        - bot_name (str): The name of the bot to search for.
-
-        Returns:
-        - str: bot dict
+        :param bot_name: The name of the bot to search for.
+        :type bot_name: str
+        :return: bot dict
+        :rtype: dict
         """
-
         for bot_info in await self.get_bots():
             if bot_info.get("name") == bot_name:
                 return bot_info
@@ -437,7 +407,6 @@ class ABLTApi:
         :return: The response message from the bot or None in case of an error.
         :rtype: dict.
         """
-
         url, headers = self.__get_url_and_headers("/v1/user/usage-statistics")
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
