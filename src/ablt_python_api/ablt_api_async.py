@@ -92,17 +92,16 @@ class ABLTApi:
                     if data.get("status") == "ok":
                         self.__logger.info("ABLT chat API is working like a charm")
                         return True
-                    else:
-                        self.__logger.error("Error: %s", data.get("status"))
-                        try:
-                            self.__logger.error("Error details:")
-                            for error in data["detail"]:
-                                self.__logger.error(
-                                    f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
-                                )
-                        except ValueError:
-                            self.__logger.error("Error text: %s", response.text)
-                            return False
+                    self.__logger.error("Error: %s", data.get("status"))
+                    try:
+                        self.__logger.error("Error details:")
+                        for error in data["detail"]:
+                            self.__logger.error(
+                                f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
+                            )
+                    except ValueError:
+                        self.__logger.error("Error text: %s", response.text)
+                        return False
                 else:
                     self.__logger.error("Request error: %s", response.status)
                     try:
@@ -229,21 +228,20 @@ class ABLTApi:
                                         if data.startswith("data:"):
                                             if "[DONE]" in data:
                                                 raise DoneException
-                                            else:
-                                                data = data[5:].strip()
-                                                try:
-                                                    message_data = json.loads(data)
-                                                except json.JSONDecodeError:
-                                                    self.__logger.error(
-                                                        "Seems json malformed %s", line
-                                                    )
-                                                    continue
-                                                content = message_data.get("content")
-                                                message = message_data.get("message")
-                                                if content is not None:
-                                                    yield content
-                                                elif message is not None:
-                                                    yield message
+                                            data = data[5:].strip()
+                                            try:
+                                                message_data = json.loads(data)
+                                            except json.JSONDecodeError:
+                                                self.__logger.error(
+                                                    "Seems json malformed %s", line
+                                                )
+                                                continue
+                                            content = message_data.get("content")
+                                            message = message_data.get("message")
+                                            if content is not None:
+                                                yield content
+                                            elif message is not None:
+                                                yield message
                         finally:
                             await response.release()
                     else:
