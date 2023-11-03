@@ -144,6 +144,7 @@ class ABLTApi:
                     self.__logger.error("Error text: %s", await response.text())
                 return None
 
+    # pylint: disable=R0914,R0912,R0915
     async def chat(
         self,
         bot_uid=None,
