@@ -11,6 +11,5 @@ Description:
 This file describes entry point for aBLT chat API.
 """
 
-# Engines
 from .src.ablt_python_api.ablt_api_async import ABLTApi as ABLTApi_async  # pylint: disable=unused-import
-from .src.ablt_python_api.ablt_api import ABLTApi  # pylint: disable=unused-import
+

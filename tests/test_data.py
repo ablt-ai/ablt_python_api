@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+"""
+Filename: test_data.py
+Author: Iliya Vereshchagin
+Copyright (c) 2023 aBLT.ai. All rights reserved.
+
+Created: 03.11.2023
+Last Modified: 03.11.2023
+
+Description:
+This file contains data for tests.
+"""
+
 unique_models = (
     "claude-2-aws-bedrock",
     "claude-aws-bedrock",

@@ -11,5 +11,5 @@ Description:
 This file describes entry point for aBLT chat API.
 """
 
-from .logger_config import setup_logger
 from .exceptions import DoneException
+from .logger_config import setup_logger

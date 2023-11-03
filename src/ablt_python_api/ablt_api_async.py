@@ -11,15 +11,15 @@ Description:
 This file contains an implementation of class for aBLT chat API.
 """
 
+import asyncio
 import json
 import logging
 from time import sleep
 
 import aiohttp
-import asyncio
 
-from .utils.logger_config import setup_logger
 from .utils.exceptions import DoneException
+from .utils.logger_config import setup_logger
 
 
 class ABLTApi:
