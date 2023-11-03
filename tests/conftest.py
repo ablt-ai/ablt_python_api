@@ -16,7 +16,7 @@ from os import environ
 import pytest
 
 from src.ablt_python_api.ablt_api_async import ABLTApi
-from tests.test_data import sslcontext
+from .test_data import sslcontext
 
 
 @pytest.fixture(scope="session")

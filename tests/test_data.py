@@ -55,5 +55,5 @@ sample_questions = (
     "What is the most famous horror movie?",
     "Where can I find the best pizza in New York?",
 )
-KEY_LENGTH = randint(8, 32)
+KEY_LENGTH = randint(8, 32)  # flake8: noqa
 MIN_WORDS = 3
