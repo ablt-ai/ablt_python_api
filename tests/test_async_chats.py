@@ -28,7 +28,6 @@ async def test_async_chats_unique_models_not_stream(api, bot_slug):
     :param api: api fixture
     :param bot_slug: bot slug
     """
-    return
     max_words = 3
     async_generator = api.chat(bot_slug=bot_slug, prompt=choice(sample_questions), max_words=max_words, stream=False)
     try:
