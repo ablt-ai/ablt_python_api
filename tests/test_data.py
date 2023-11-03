@@ -10,6 +10,11 @@ Last Modified: 03.11.2023
 Description:
 This file contains data for tests.
 """
+import ssl
+
+sslcontext = ssl.create_default_context()
+sslcontext.check_hostname = False
+sslcontext.verify_mode = ssl.CERT_NONE
 
 unique_models = (
     "claude-2-aws-bedrock",

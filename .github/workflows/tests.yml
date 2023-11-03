@@ -27,4 +27,6 @@ jobs:
         pip install -r requirements.txt
     - name: Execute tests
       id: tests
+      env:
+        BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
       run: PYTHONPATH=. pytest tests -vv -rfEx --tb=short -p no:warnings -n=16
