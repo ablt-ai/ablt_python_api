@@ -18,8 +18,8 @@ from time import sleep
 import aiohttp
 import asyncio
 
-from utils.logger_config import setup_logger
-from utils.exceptions import DoneException
+from .utils.logger_config import setup_logger
+from .utils.exceptions import DoneException
 
 
 class ABLTApi:
@@ -27,7 +27,8 @@ class ABLTApi:
     aBLT Chat API master class
     """
 
-    def __init__(self, bearer_token: str, base_api_url: str = 'https://api.ablt.ai', logger: logging.Logger = None):
+    def __init__(self, bearer_token: str, base_api_url: str = 'https://api.ablt.ai', logger: logging.Logger = None,
+                 ssl_context=None):
         """
         Initializes the object with the provided base API URL and bearer token.
 
@@ -37,14 +38,18 @@ class ABLTApi:
         :type base_api_url: str
         :param logger: default logger.
         :type logger: logger
+        :param ssl_context: ssl context for aiohttp.
+        :type ssl_context: ssl.SSLContext
         """
         self.__base_api_url = base_api_url
         self.__bearer_token = bearer_token
+        self.__ssl_context = ssl_context
         if logger:
             self.__logger = logger
         else:
             self.__logger = setup_logger("api", "api.log")
             self.__logger.info("Logger for API now launched!")
+
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
@@ -81,7 +86,7 @@ class ABLTApi:
         """
         url, headers = self.__get_url_and_headers("health-check")
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     data = await response.json()
                     if data.get("status") == "ok":
@@ -169,12 +174,12 @@ class ABLTApi:
         :type language: str
         :param assumptions: The assumptions for the chat, default is None (TBD).
         :type assumptions: dict
-        :param max_words: The maximum number of words in the response, default is 20.
+        :param max_words: The maximum number of words in the response, if None, the default value is used.
         :type max_words: int
         :param use_search: A flag for using search mode (default is False).
         :type use_search: bool
         :return: The response message from the bot or None in case of an error.
-        :rtype: str
+        :rtype: yield
 
         Important: Only one of the parameters 'prompt' or 'messages' should be provided.
                    Only one of the parameters 'bot_uid' or 'bot_slug' should be provided.
@@ -213,7 +218,7 @@ class ABLTApi:
         }
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, json=data) as response:
+            async with session.post(url, headers=headers, json=data, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     if stream:
                         try:
@@ -438,7 +443,7 @@ class ABLTApi:
 
         url, headers = self.__get_url_and_headers("/v1/user/usage-statistics")
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     data = await response.json()
                     return data
