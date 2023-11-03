@@ -88,7 +88,7 @@ class ABLTApi:
         url, headers = self.__get_url_and_headers("health-check")
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
-                if response.status == 200:  # flake8: noqa
+                if response.status == 200:
                     data = await response.json()
                     if data.get("status") == "ok":
                         self.__logger.info("ABLT chat API is working like a charm")
@@ -129,7 +129,7 @@ class ABLTApi:
         url, headers = self.__get_url_and_headers("v1/bots")
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
-                if response.status == 200:  # flake8: noqa
+                if response.status == 200:
                     return await response.json()
                 self.__logger.error("Request error: %s", response.status)
                 try:
@@ -189,6 +189,9 @@ class ABLTApi:
           will print an error message and return None.
         - If the 'messages' parameter is provided, but its elements do not have the required keys or
           their values are not of the correct type, the function will print an error message and return None.
+
+        Raises:
+            DoneException: If the bot is done with the conversation.
         """
         if (not prompt and not messages) or (prompt and messages):
             self.__logger.error("Error: Only one param is required ('prompt' or 'messages')")
@@ -214,7 +217,7 @@ class ABLTApi:
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload, ssl=self.__ssl_context) as response:
-                if response.status == 200:  # flake8: noqa
+                if response.status == 200:
                     if stream:
                         try:
                             async for line in response.content.iter_any():
@@ -242,9 +245,9 @@ class ABLTApi:
                         response_json = await response.json()
 
                         if "message" in response_json:
-                            message = response_json["message"]
+                            message = response_json.get("message")
                         elif "content" in response_json:
-                            message = response_json["content"]
+                            message = response_json.get("content")
                         else:
                             self.__logger.error("Response malformed! Actual response is: %s", response_json)
                             return
@@ -274,7 +277,10 @@ class ABLTApi:
         """
         Updates the API by calling the health_check function.
 
-        :raise ConnectionError: If the health_check function fails 10 times in a row.
+        :raises ConnectionError: If the health_check function fails 10 times in a row.
+
+        Raises:
+            ConnectionError: If the health_check function fails 10 times in a row.
         """
         retries = 0
         while retries <= 10:
@@ -411,8 +417,7 @@ class ABLTApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
-                    data = await response.json()
-                    return data
+                    return await response.json()
                 self.__logger.error("Request error: %s", response.status)
                 try:
                     error_data = await response.json()

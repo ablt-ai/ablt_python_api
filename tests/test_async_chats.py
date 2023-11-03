@@ -31,7 +31,7 @@ async def test_async_chats_unique_models_not_stream(api, bot_slug):
     max_words = 3
     async_generator = api.chat(bot_slug=bot_slug, prompt=choice(sample_questions), max_words=max_words, stream=False)
     try:
-        response = await async_generator.anext()
+        response = await async_generator.__anext__()
     except StopAsyncIteration:
         response = None
     assert response is not None
