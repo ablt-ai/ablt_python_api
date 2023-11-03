@@ -93,7 +93,7 @@ class ABLTApi:
                         self.__logger.info("ABLT chat API is working like a charm")
                         return True
                     else:
-                        self.__logger.error(f"Error: {data.get('status')}")
+                        self.__logger.error("Error: %s", data.get("status"))
                         try:
                             self.__logger.error("Error details:")
                             for error in data["detail"]:
@@ -101,10 +101,10 @@ class ABLTApi:
                                     f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
                                 )
                         except ValueError:
-                            self.__logger.error(f"Error text: {response.text}")
+                            self.__logger.error("Error text: %s", response.text)
                             return False
                 else:
-                    self.__logger.error(f"Request error: {response.status}")
+                    self.__logger.error("Request error: %s", response.status)
                     try:
                         error_data = await response.json()
                         self.__logger.error("Error details:")
@@ -113,7 +113,7 @@ class ABLTApi:
                                 f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
                             )
                     except ValueError:
-                        self.__logger.error(f"Error text: {response.text}")
+                        self.__logger.error("Error text: %s", response.text)
                     return False
 
     async def get_bots(self):
@@ -133,12 +133,12 @@ class ABLTApi:
                     data = await response.json()
                     return data
                 else:
-                    self.__logger.error(f"Request error: {response.status}")
+                    self.__logger.error("Request error: %s", response.status)
                     try:
                         error_data = await response.json()
-                        self.__logger.error(f"Error details: {error_data}")
+                        self.__logger.error("Error details: %s", error_data)
                     except ValueError:
-                        self.__logger.error(f"Error text: {await response.text()}")
+                        self.__logger.error("Error text: %s", await response.text())
                     return None
 
     async def chat(
@@ -235,7 +235,7 @@ class ABLTApi:
                                                     message_data = json.loads(data)
                                                 except json.JSONDecodeError:
                                                     self.__logger.error(
-                                                        f"Seems json malformed {line}"
+                                                        "Seems json malformed %s", line
                                                     )
                                                     continue
                                                 content = message_data.get("content")
@@ -260,13 +260,13 @@ class ABLTApi:
                             return
                         yield message
                 else:
-                    self.__logger.error(f"Error: {response.status}")
+                    self.__logger.error("Error: %s", response.status)
                     try:
                         error_data = await response.json()
 
                         self.__logger.error("Error details:")
                         if isinstance(error_data["detail"], str):
-                            self.__logger.error(f"  - {error_data['detail']}")
+                            self.__logger.error("  - %s", error_data['detail'])
                         else:
                             for error in error_data["detail"]:
                                 if error.get("msg") and error.get("type") and error.get("loc"):
@@ -274,10 +274,10 @@ class ABLTApi:
                                         f"  - {error['msg']} (type: {error['type']}, location: {error['loc']})"
                                     )
                                 else:
-                                    self.__logger.error(f"  - {error}")
+                                    self.__logger.error("  - %s", error)
                     except ValueError:
                         error_text = await response.text()
-                        self.__logger.error(f"Error text: {error_text}")
+                        self.__logger.error("Error text: %s", error_text)
                     return
 
     async def update_api(self):
@@ -455,12 +455,12 @@ class ABLTApi:
                     data = await response.json()
                     return data
                 else:
-                    self.__logger.error(f"Request error: {response.status}")
+                    self.__logger.error("Request error: %s", response.status)
                     try:
                         error_data = await response.json()
-                        self.__logger.error(f"Error details: {error_data}")
+                        self.__logger.error("Error details: %s", error_data)
                     except ValueError:
-                        self.__logger.error(f"Error text: {await response.text()}")
+                        self.__logger.error("Error text: %s", await response.text())
                     return None
 
     async def get_statistics_for_a_day(self, day: str):

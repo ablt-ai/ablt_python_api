@@ -31,7 +31,7 @@ class TestAsyncConstructor:
     def test_async_constructor_without_token(self):
         """Test against constructor without token."""
         with pytest.raises(TypeError):
-            ABLTApi()
+            ABLTApi()  # pylint: disable=E1120
 
     def test_async_constructor_default_init_with_any_token(self, caplog):
         """
