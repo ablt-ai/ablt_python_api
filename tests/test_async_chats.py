@@ -16,7 +16,7 @@ from random import choice
 import pytest
 
 from src.ablt_python_api.utils.exceptions import DoneException
-from tests.test_data import sample_questions, unique_models
+from tests.test_data import sample_questions, unique_models, MIN_WORDS
 
 
 @pytest.mark.asyncio
@@ -31,7 +31,7 @@ async def test_async_chats_unique_models_not_stream(api, bot_slug):
     max_words = 3
     async_generator = api.chat(bot_slug=bot_slug, prompt=choice(sample_questions), max_words=max_words, stream=False)
     try:
-        response = await async_generator.__anext__()
+        response = await async_generator.anext()
     except StopAsyncIteration:
         response = None
     assert response is not None
@@ -46,7 +46,7 @@ async def test_async_chats_unique_models_stream(api, bot_slug):
     :param api: api fixture
     :param bot_slug: bot slug
     """
-    max_words = 3
+    max_words = MIN_WORDS
     async_generator = api.chat(bot_slug=bot_slug, prompt=choice(sample_questions), max_words=max_words, stream=True)
     full_response = []
     try:

@@ -11,6 +11,7 @@ Description:
 This file contains data for tests.
 """
 import ssl
+from random import randint
 
 sslcontext = ssl.create_default_context()
 sslcontext.check_hostname = False
@@ -54,3 +55,5 @@ sample_questions = (
     "What is the most famous horror movie?",
     "Where can I find the best pizza in New York?",
 )
+KEY_LENGTH = randint(8, 32)
+MIN_WORDS = 3
