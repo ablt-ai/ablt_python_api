@@ -12,3 +12,4 @@ This file describes entry point for aBLT chat API.
 """
 
 from .src.ablt_python_api.ablt_api_async import ABLTApi as ABLTApi_async  # pylint: disable=unused-import
+from .src.ablt_python_api.utils.exceptions import DoneException  # pylint: disable=unused-import
