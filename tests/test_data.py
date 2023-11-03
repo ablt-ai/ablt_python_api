@@ -10,6 +10,12 @@ Last Modified: 03.11.2023
 Description:
 This file contains data for tests.
 """
+import ssl
+from random import randint
+
+sslcontext = ssl.create_default_context()
+sslcontext.check_hostname = False
+sslcontext.verify_mode = ssl.CERT_NONE
 
 unique_models = (
     "claude-2-aws-bedrock",
@@ -49,3 +55,5 @@ sample_questions = (
     "What is the most famous horror movie?",
     "Where can I find the best pizza in New York?",
 )
+KEY_LENGTH = randint(8, 32)  # flake8: noqa
+MIN_WORDS = 3

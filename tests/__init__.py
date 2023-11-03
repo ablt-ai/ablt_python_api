@@ -8,7 +8,5 @@ Created: 03.11.2023
 Last Modified: 03.11.2023
 
 Description:
-This file describes entry point for aBLT chat API.
+This file describes entry point for aBLT chat API tests.
 """
-
-from .src.ablt_python_api.ablt_api_async import ABLTApi as ABLTApi_async  # pylint: disable=unused-import

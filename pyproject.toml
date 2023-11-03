@@ -98,7 +98,8 @@ extend-ignore = """
     WPS111,
     WPS213,
     WPS211,
-    WPS231
+    WPS231,
+    S311
 """
 
 [tool.pylint]

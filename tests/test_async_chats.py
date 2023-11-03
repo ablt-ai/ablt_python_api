@@ -11,48 +11,60 @@ Description:
 This file tests for async chats.
 """
 
-import ssl
-from os import environ
 from random import choice
 
 import pytest
 
-from src.ablt_python_api.ablt_api_async import ABLTApi
-from tests.test_data import sample_questions, unique_models
+from src.ablt_python_api.utils.exceptions import DoneException
+from tests.test_data import sample_questions, unique_models, MIN_WORDS
 
 
-class TestAsyncChats:
-    """This class tests for async chats."""
+@pytest.mark.asyncio
+@pytest.mark.parametrize("bot_slug", unique_models, ids=unique_models)
+async def test_async_chats_unique_models_not_stream(api, bot_slug):
+    """
+    This method tests for async chats (with/without stream) for unique models.
 
-    sslcontext = ssl.create_default_context()
-    sslcontext.check_hostname = False
-    sslcontext.verify_mode = ssl.CERT_NONE
-    api = ABLTApi(bearer_token=environ["BEARER_TOKEN"], ssl_context=sslcontext)
+    :param api: api fixture
+    :param bot_slug: bot slug
+    """
+    max_words = 3
+    async_generator = api.chat(bot_slug=bot_slug, prompt=choice(sample_questions), max_words=max_words, stream=False)
+    try:
+        response = await async_generator.__anext__()  # pylint: disable=C2801
+    except StopAsyncIteration:
+        response = None
+    assert response is not None
 
-    @pytest.mark.asyncio
-    @pytest.mark.parametrize("bot_slug,stream", unique_models, (False, True))
-    async def test_async_chats_unique_models(self, bot_slug, stream):
-        """
-        This method tests for async chats (with/without stream) for unique models.
 
-        :param bot_slug: bot slug
-        """
-        max_words = 3
-        async_generator = self.api.chat(
-            bot_slug=bot_slug, prompt=choice(sample_questions), max_words=max_words, stream=stream
-        )
-        try:
-            response = await async_generator.__anext__()
-        except StopAsyncIteration:
-            response = None
-        assert response is not None
+@pytest.mark.asyncio
+@pytest.mark.parametrize("bot_slug", unique_models, ids=unique_models)
+async def test_async_chats_unique_models_stream(api, bot_slug):
+    """
+    This method tests for async chats (with/without stream) for unique models.
 
-    @pytest.mark.asyncio
-    async def test_async_chats_tbd1(self):
-        """This method tests for async chats."""
-        assert True
+    :param api: api fixture
+    :param bot_slug: bot slug
+    """
+    max_words = MIN_WORDS
+    async_generator = api.chat(bot_slug=bot_slug, prompt=choice(sample_questions), max_words=max_words, stream=True)
+    full_response = []
+    try:
+        async for response in async_generator:
+            assert response is not None
+            full_response.append(response)
+    except (StopAsyncIteration, DoneException):
+        pass
+    assert len(full_response) > 0
 
-    @pytest.mark.asyncio
-    async def test_async_chats_tbd2(self):
-        """This method tests for async chats."""
-        assert True
+
+@pytest.mark.asyncio
+async def test_async_chats_tbd1():
+    """This method tests for async chats."""
+    assert True
+
+
+@pytest.mark.asyncio
+async def test_async_chats_tbd2():
+    """This method tests for async chats."""
+    assert True
