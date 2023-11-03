@@ -15,7 +15,7 @@ import os
 import sys
 
 
-def setup_logger(name: str, log_file: str, level: int = logging.DEBUG):
+def setup_logger(name: str, log_file: str = None, level: int = logging.DEBUG):
     """
     Function to setup as many loggers as you want
 
@@ -30,15 +30,15 @@ def setup_logger(name: str, log_file: str, level: int = logging.DEBUG):
     """
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
-    file_handler = logging.FileHandler(log_file)
-    file_handler.setFormatter(formatter)
     stream_handler = logging.StreamHandler(sys.stdout)
     stream_handler.setFormatter(formatter)
 
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
-    if not is_heroku_environment():
+    if not is_heroku_environment() and log_file is not None:
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
 
