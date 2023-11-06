@@ -41,7 +41,7 @@ def random_date_generator():
     :rtype: function
     """
 
-    def _generate_random_date(days: int, end_date: datetime = datetime.now(), forward: bool = False):
+    def _generate_random_date(days: int, end_date: None, forward: bool = False):
         """
         This function generates random date.
 
@@ -51,6 +51,7 @@ def random_date_generator():
         :return: random date in format %Y-%m-%d
         :rtype: str
         """
+        end_date = datetime.now() if end_date is None else end_date
         if forward:
             start_date = end_date
             end_date = end_date + timedelta(days=days)
@@ -58,9 +59,8 @@ def random_date_generator():
             start_date = end_date - timedelta(days=days)
 
         random_date = start_date + (end_date - start_date) * random.random()
-        formatted_random_date = random_date.strftime("%Y-%m-%d")
 
-        return formatted_random_date
+        return random_date.strftime("%Y-%m-%d")
 
     return _generate_random_date
 
@@ -74,7 +74,7 @@ def days_between_dates():
     :rtype: function
     """
 
-    def _days_between_dates(start_date_str: str, end_date_str: str = datetime.now().strftime("%Y-%m-%d")):
+    def _days_between_dates(start_date_str: str, end_date_str: str):
         """
         This function calculates days between two dates.
 
@@ -83,6 +83,7 @@ def days_between_dates():
         :return: count of days
         :rtype: int
         """
+        end_date_str = datetime.now().strftime("%Y-%m-%d") if end_date_str is None else end_date_str
         start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
         end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
 

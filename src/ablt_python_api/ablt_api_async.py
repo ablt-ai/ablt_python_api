@@ -47,9 +47,12 @@ class ABLTApi:
         :type logger: logger
         :param ssl_context: ssl context for aiohttp.
         :type ssl_context: ssl.SSLContext
+
+        Raises:
+            TypeError: If the bearer token is not provided.
         """
         self.__base_api_url = base_api_url
-        if not bearer_token:
+        if bearer_token is None:
             if environ.get("ABLT_BEARER_TOKEN"):
                 self.__bearer_token = environ["ABLT_BEARER_TOKEN"]
             else:
@@ -417,8 +420,8 @@ class ABLTApi:
     async def get_usage_statistics(
         self,
         user_id: str = "-1",
-        start_date: str = datetime.now().strftime("%Y-%m-%d"),
-        end_date: str = datetime.now().strftime("%Y-%m-%d"),
+        start_date: str = None,
+        end_date: str = None,
     ) -> Optional[dict]:
         """
         Retrieves usage statistics for the API.
@@ -432,6 +435,8 @@ class ABLTApi:
         :return: The response message from the bot (StatisticsSchema) or None in case of an error.
         :rtype: dict|None
         """
+        start_date = datetime.now().strftime("%Y-%m-%d") if start_date is None else start_date
+        end_date = datetime.now().strftime("%Y-%m-%d") if end_date is None else end_date
         url, headers = self.__get_url_and_headers("v1/user/usage-statistics")
         payload = {"user_id": user_id, "start_date": start_date, "end_date": end_date}
         async with aiohttp.ClientSession() as session:

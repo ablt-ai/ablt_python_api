@@ -24,9 +24,11 @@ from tests.test_data import sslcontext, KEY_LENGTH
 
 def test_async_constructor_without_token():
     """Test against constructor without token."""
+    bearer_token = environ["ABLT_BEARER_TOKEN"]
     environ["ABLT_BEARER_TOKEN"] = ""
     with pytest.raises(TypeError):
         ABLTApi(ssl_context=sslcontext)
+    environ["ABLT_BEARER_TOKEN"] = bearer_token
 
 
 def test_async_constructor_with_env_token(caplog):
@@ -35,11 +37,9 @@ def test_async_constructor_with_env_token(caplog):
 
     :param caplog: caplog pytest fixture
     """
-    environ["ABLT_BEARER_TOKEN"] = ""
-    with pytest.raises(TypeError):
-        ABLTApi(ssl_context=sslcontext)
-        assert "Logger for API now launched!" in caplog.text
-        assert "ABLT chat API is working like a charm" in caplog.text
+    ABLTApi(ssl_context=sslcontext)
+    assert "Logger for API now launched!" in caplog.text
+    assert "ABLT chat API is working like a charm" in caplog.text
 
 
 def test_async_constructor_default_init_with_any_token(caplog):
