@@ -19,16 +19,8 @@ requires-python = ">=3.9"
 dependencies = [
     'requests',
     'aiohttp',
-    'aiofiles',
     'asyncio',
-    'requests',
-    'urllib3',
-    'async-timeout',
-    'certifi',
-    'charset-normalizer',
-    'frozenlist',
-    'pillow',
-    'openai'
+    'pydantic'
 ]
 classifiers = [
     "Programming Language :: Python :: 3.9",

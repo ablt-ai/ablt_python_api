@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Filename: __init__.py
+Filename: ablt_api_async.py
 Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 03.11.2023
+Last Modified: 06.11.2023
 
 Description:
 This file contains an implementation of class for aBLT chat API.
@@ -15,11 +15,13 @@ import asyncio
 import json
 import logging
 import ssl
+from datetime import datetime
 from time import sleep
-from typing import Optional
+from typing import Optional, List, Dict
 
 import aiohttp
 
+from .schemas import StatisticsSchema, StatisticItemSchema, StatisticTotalSchema, BotSchema
 from .utils.exceptions import DoneException
 from .utils.logger_config import setup_logger
 
@@ -66,7 +68,7 @@ class ABLTApi:
         else:
             loop.run_until_complete(self.update_api())
 
-    def __get_url_and_headers(self, endpoint: str):
+    def __get_url_and_headers(self, endpoint: str) -> tuple[str, dict]:
         """
         Constructs the URL and headers for an API request.
 
@@ -79,7 +81,7 @@ class ABLTApi:
         headers = {"Authorization": f"Bearer {self.__bearer_token}"}
         return url, headers
 
-    async def health_check(self):
+    async def health_check(self) -> bool:
         """
         Performs a health check on the API.
 
@@ -120,16 +122,16 @@ class ABLTApi:
                         self.__logger.error("Error text: %s", response.text)
                     return False
 
-    async def get_bots(self):
+    async def get_bots(self) -> Optional[List[Dict[str, BotSchema]]]:
         """
         Retrieves all published bots.
 
         :return: A list of dictionaries containing bot information, or an empty list if an error occurs.
-        :rtype: list
+        :rtype: list of BotSchema
         """
         url, headers = self.__get_url_and_headers("v1/bots")
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     return await response.json()
                 self.__logger.error("Request error: %s", response.status)
@@ -143,16 +145,16 @@ class ABLTApi:
     # pylint: disable=R0914,R0912,R0915
     async def chat(
         self,
-        bot_uid=None,
-        bot_slug=None,
-        prompt=None,
+        bot_uid: Optional[str] = None,
+        bot_slug: Optional[str] = None,
+        prompt: Optional[str] = None,
         messages=None,
-        stream=False,
-        user=None,
-        language=None,
-        assumptions=None,
-        max_words=None,
-        use_search=False,
+        stream: Optional[bool] = False,
+        user: Optional[str] = None,
+        language: Optional[str] = None,
+        assumptions: Optional[dict] = None,
+        max_words: Optional[int] = None,
+        use_search: Optional[bool] = False,
     ):
         """
         Sends a chat request to the API and returns the response.
@@ -274,7 +276,7 @@ class ABLTApi:
                         self.__logger.error("Error text: %s", error_text)
                     return
 
-    async def update_api(self):
+    async def update_api(self) -> None:
         """
         Updates the API by calling the health_check function.
 
@@ -294,7 +296,7 @@ class ABLTApi:
         if retries >= 10:
             raise ConnectionError("ERROR: Connection to aBLT API couldn't be established")
 
-    async def set_base_api_url(self, new_base_api_url, instant_update=False):
+    async def set_base_api_url(self, new_base_api_url: str, instant_update: bool = False):
         """
         Sets a new base API URL.
 
@@ -307,7 +309,7 @@ class ABLTApi:
         if instant_update:
             await self.update_api()
 
-    async def set_bearer_token(self, new_bearer_token, instant_update=False):
+    async def set_bearer_token(self, new_bearer_token: str, instant_update: bool = False):
         """
         Sets a new bearer token.
 
@@ -320,7 +322,7 @@ class ABLTApi:
         if instant_update:
             await self.update_api()
 
-    async def update_api_info(self, new_bearer_token=None, new_base_api_url=None):
+    async def update_api_info(self, new_bearer_token: str = None, new_base_api_url: str = None):
         """
         Updates the API information with new bearer token and/or new base API URL.
 
@@ -329,7 +331,7 @@ class ABLTApi:
         :param new_base_api_url: The new base API URL as a string, if any. Default is None.
         :type new_base_api_url: str
         - new_bearer_token (str): The new bearer token as a string, if any. Default is None.
-        - new_base_api_url (bool): The new base API URL as a string, if any. Default is None.
+        - new_base_api_url (str): The new base API URL as a string, if any. Default is None.
         """
         if new_bearer_token:
             await self.set_bearer_token(new_bearer_token)
@@ -337,7 +339,7 @@ class ABLTApi:
             await self.set_base_api_url(new_base_api_url)
         await self.update_api()
 
-    def get_base_api_url(self):
+    def get_base_api_url(self) -> str:
         """
         Returns the current base API URL as a string.
 
@@ -346,7 +348,7 @@ class ABLTApi:
         """
         return self.__base_api_url
 
-    def get_bearer_token(self):
+    def get_bearer_token(self) -> str:
         """
         Returns the current bearer token as a string.
 
@@ -355,7 +357,7 @@ class ABLTApi:
         """
         return self.__bearer_token
 
-    def set_logger(self, new_logger):
+    def set_logger(self, new_logger: logging.Logger):
         """
         Sets logger for API
 
@@ -365,58 +367,70 @@ class ABLTApi:
         """
         self.__logger = new_logger
 
-    async def find_bot_by_uid(self, bot_uid):
+    async def find_bot_by_uid(self, bot_uid: str) -> Optional[BotSchema]:
         """
         Searches for a bot by its id in the bot list.
 
         :param bot_uid: The id of the bot to search for.
         :type bot_uid: str
         :return: bot dict
-        :rtype: dict
+        :rtype: BotSchema | None
         """
         for bot_info in await self.get_bots():
             if bot_info.get("uid") == bot_uid:
                 return bot_info
         return None
 
-    async def find_bot_by_slug(self, bot_slug):
+    async def find_bot_by_slug(self, bot_slug: str) -> Optional[BotSchema]:
         """
         Searches for a bot by its slug in the bot list.
 
         :param bot_slug: The slug of the bot to search for.
         :type bot_slug: str
         :return: bot dict
-        :rtype: dict
+        :rtype: BotSchema | None
         """
         for bot_info in await self.get_bots():
             if bot_info.get("slug") == bot_slug:
                 return bot_info
         return None
 
-    async def find_bot_by_name(self, bot_name):
+    async def find_bot_by_name(self, bot_name: str) -> Optional[BotSchema]:
         """
         Searches for a bot by its name in the bot list.
 
         :param bot_name: The name of the bot to search for.
         :type bot_name: str
         :return: bot dict
-        :rtype: dict
+        :rtype: BotSchema | None
         """
         for bot_info in await self.get_bots():
             if bot_info.get("name") == bot_name:
                 return bot_info
         return None
 
-    async def get_usage_statistics(self):
+    async def get_usage_statistics(
+        self,
+        user_id: str = "-1",
+        start_date: str = datetime.now().strftime("%Y-%m-%d"),
+        end_date: str = datetime.now().strftime("%Y-%m-%d"),
+    ) -> Optional[StatisticsSchema]:
         """
         Retrieves usage statistics for the API.
 
+        :param user_id: The id of the user to get statistics for.
+        :type user_id: str
+        :param start_date: The start date for the statistics in format YYYY-MM-DD.
+        :type start_date: str
+        :param end_date: The end date for the statistics in format YYYY-MM-DD.
+        :type end_date: str
         :return: The response message from the bot or None in case of an error.
-        :rtype: dict.
+        :rtype: StatisticsSchema | None
         """
-        url, headers = self.__get_url_and_headers("/v1/user/usage-statistics")
+        url, headers = self.__get_url_and_headers("v1/user/usage-statistics")
+        payload = {"user_id": user_id, "start_date": start_date, "end_date": end_date}
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
+            async with session.post(url, json=payload, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     return await response.json()
                 self.__logger.error("Request error: %s", response.status)
@@ -427,16 +441,31 @@ class ABLTApi:
                     self.__logger.error("Error text: %s", await response.text())
                 return None
 
-    async def get_statistics_for_a_day(self, day: str):
+    async def get_statistics_for_a_day(self, day: str) -> Optional[StatisticItemSchema]:
         """
         Retrieves usage statistics for the API.
 
         :param day: day for which statistics are needed. It should be in format YYYY-MM-DD.
         :return: dict with statistics for a day.
-        :rtype: dict.
+        :rtype: StatisticItemSchema | None.
         """
-        items = self.get_usage_statistics().get("items")
+        items = (await self.get_usage_statistics(start_date=day, end_date=day)).get("items")
         for usage_info in await items:
             if usage_info.get("date") == day:
                 return usage_info
         return None
+
+    async def get_statistics_total(self, user_id: str, start_date: str, end_date: str) -> StatisticTotalSchema:
+        """
+        Retrieves usage statistics for the API.
+
+        :param user_id: The id of the user to get statistics for.
+        :type user_id: int
+        :param start_date: start date for statistics.
+        :type start_date: str
+        :param end_date: end date for statistics.
+        :type end_date: str
+        :return: dict with total statistics.
+        :rtype: StatisticTotalSchema.
+        """
+        return (await self.get_usage_statistics(user_id=user_id, start_date=start_date, end_date=end_date)).get("total")
