@@ -40,6 +40,7 @@ def random_date_generator():
     :return: function that generates random date in format %Y-%m-%d
     :rtype: function
     """
+
     def _generate_random_date(days: int, end_date: datetime = datetime.now(), forward: bool = False):
         """
         This function generates random date.
@@ -72,6 +73,7 @@ def days_between_dates():
     :return: function that calculates days between two dates
     :rtype: function
     """
+
     def _days_between_dates(start_date_str: str, end_date_str: str = datetime.now().strftime("%Y-%m-%d")):
         """
         This function calculates days between two dates.

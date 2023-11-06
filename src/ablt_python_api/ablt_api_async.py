@@ -147,7 +147,7 @@ class ABLTApi:
                     self.__logger.error("Error details: %s", error_data)
                 except ValueError:
                     self.__logger.error("Error text: %s", await response.text())
-                return None
+                return []
 
     # pylint: disable=R0914,R0912,R0915
     async def chat(
@@ -329,7 +329,7 @@ class ABLTApi:
         if instant_update:
             await self.update_api()
 
-    async def update_api_info(self, new_bearer_token: str = None, new_base_api_url: str = None):
+    async def update_api_info(self, new_bearer_token: Optional[str] = None, new_base_api_url: Optional[str] = None):
         """
         Updates the API information with new bearer token and/or new base API URL.
 
@@ -459,10 +459,12 @@ class ABLTApi:
         :return: dict with statistics for a day.
         :rtype: StatisticItemSchema | None.
         """
-        items = (await self.get_usage_statistics(user_id=user_id, start_date=date, end_date=date)).get("items")
-        for usage_info in items:
-            if usage_info.get("date") == date:
-                return usage_info
+        stats = await self.get_usage_statistics(user_id=user_id, start_date=date, end_date=date)
+        if stats:
+            items = stats.get("items")
+            for usage_info in items:
+                if usage_info.get("date") == date:
+                    return usage_info
         return None
 
     async def get_statistics_total(self, user_id: str, start_date: str, end_date: str) -> StatisticTotalSchema:
@@ -478,4 +480,5 @@ class ABLTApi:
         :return: dict with total statistics.
         :rtype: StatisticTotalSchema.
         """
-        return (await self.get_usage_statistics(user_id=user_id, start_date=start_date, end_date=end_date)).get("total")
+        stats = await self.get_usage_statistics(user_id=user_id, start_date=start_date, end_date=end_date)
+        return stats.get("total") if stats is not None else None
