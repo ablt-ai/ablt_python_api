@@ -190,12 +190,11 @@ async def test_async_statistics_get_total(api, random_date_generator):
 
 
 @pytest.mark.asyncio
-async def test_async_statistics_content(api, random_date_generator):
+async def test_async_statistics_content(api):
     """
     This method tests for async statistics: content
 
     :param api: api fixture
-    :param random_date_generator: random_date_generator fixture
     """
     date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
     response = await api.get_usage_statistics(start_date=date, end_date=date)
