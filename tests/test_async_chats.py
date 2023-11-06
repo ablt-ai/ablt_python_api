@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Filename: test_async_constructor.py
+Filename: test_async_chats.py
 Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 03.11.2023
+Last Modified: 06.11.2023
 
 Description:
 This file tests for async chats.

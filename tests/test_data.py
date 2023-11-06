@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 03.11.2023
+Last Modified: 06.11.2023
 
 Description:
 This file contains data for tests.
@@ -55,5 +55,37 @@ sample_questions = (
     "What is the most famous horror movie?",
     "Where can I find the best pizza in New York?",
 )
-KEY_LENGTH = randint(8, 32)  # flake8: noqa
+KEY_LENGTH = randint(8, 32)
 MIN_WORDS = 3
+SOME_USER_ID_RANGE = 65536
+DATE_TEST_PERIOD = 365
+
+ensured_bots = (
+    {
+        "uid": "9c24d711-e599-421c-a5fa-d15e113f14f6",
+        "slug": "omni",
+        "model": "gpt-4",
+        "name": "Omni",
+        "description": "An omniscient bot with knowledge of everything",
+        "welcome_message": "Hi, I'm Omni. \n\nHow can I help you today?",
+        "avatar_url": "https://strapi-ablt.s3.amazonaws.com/thumbnail_omni_bdf1a23d4e.jpg",
+    },
+    {
+        "uid": "74b9d85e-10Ac-3e6B-bfCF-dc8A77E2FDC3",
+        "slug": "eco",
+        "model": "gpt-4",
+        "name": "Eco",
+        "description": "Your guide to recycling, upcycling, and the environment",
+        "welcome_message": "Hey dude! I'm Eco, your gnarly guide to all things green and clean.\n\nWhat's up?",
+        "avatar_url": "https://strapi-ablt.s3.amazonaws.com/thumbnail_recycle_a42d696442.jpg",
+    },
+    {
+        "uid": "bD2EFCaD-1030-2AaE-9657-6DAB6f30e5be",
+        "slug": "character",
+        "model": "gpt-4",
+        "name": "Character Template",
+        "description": "Create AI characters for yourself or business",
+        "welcome_message": "Hello. How can I help you today?",
+        "avatar_url": "https://strapi-ablt.s3.amazonaws.com/thumbnail_666201_3b63097729.jpg",
+    },
+)
