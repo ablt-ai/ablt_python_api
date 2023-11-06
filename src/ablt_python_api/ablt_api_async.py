@@ -112,21 +112,20 @@ class ABLTApi:
                     except ValueError:
                         self.__logger.error("Error text: %s", response.text)
                     return False
-                else:
-                    self.__logger.error("Request error: %s", response.status)
-                    try:
-                        error_data = await response.json()
-                        self.__logger.error("Error details:")
-                        for original_error in error_data["detail"]:
-                            self.__logger.error(
-                                "  - %s (type: %s, location: %s)",
-                                original_error["msg"],
-                                original_error["type"],
-                                original_error["loc"],
-                            )
-                    except ValueError:
-                        self.__logger.error("Error text: %s", response.text)
-                    return False
+                self.__logger.error("Request error: %s", response.status)
+                try:
+                    error_data = await response.json()
+                    self.__logger.error("Error details:")
+                    for original_error in error_data["detail"]:
+                        self.__logger.error(
+                            "  - %s (type: %s, location: %s)",
+                            original_error["msg"],
+                            original_error["type"],
+                            original_error["loc"],
+                        )
+                except ValueError:
+                    self.__logger.error("Error text: %s", response.text)
+                return False
 
     async def get_bots(self) -> list[dict]:
         """
