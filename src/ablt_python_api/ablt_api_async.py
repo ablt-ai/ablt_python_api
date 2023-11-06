@@ -18,11 +18,10 @@ import ssl
 from datetime import datetime
 from os import environ
 from time import sleep
-from typing import Optional, List
+from typing import Optional
 
 import aiohttp
 
-from .schemas import StatisticsSchema, StatisticItemSchema, StatisticTotalSchema, BotSchema
 from .utils.exceptions import DoneException
 from .utils.logger_config import setup_logger
 
@@ -129,12 +128,12 @@ class ABLTApi:
                         self.__logger.error("Error text: %s", response.text)
                     return False
 
-    async def get_bots(self) -> List[BotSchema]:
+    async def get_bots(self) -> list[dict]:
         """
         Retrieves all published bots.
 
-        :return: A list of dictionaries containing bot information, or an empty list if an error occurs.
-        :rtype: list of BotSchema
+        :return: A list of dictionaries containing bot information (BotSchema), or an empty list if an error occurs.
+        :rtype: list[dict]
         """
         url, headers = self.__get_url_and_headers("v1/bots")
         async with aiohttp.ClientSession() as session:
@@ -374,42 +373,42 @@ class ABLTApi:
         """
         self.__logger = new_logger
 
-    async def find_bot_by_uid(self, bot_uid: str) -> Optional[BotSchema]:
+    async def find_bot_by_uid(self, bot_uid: str) -> Optional[dict]:
         """
         Searches for a bot by its id in the bot list.
 
         :param bot_uid: The id of the bot to search for.
         :type bot_uid: str
-        :return: bot dict
-        :rtype: BotSchema | None
+        :return: bot dict (BotSchema).
+        :rtype: dict|None
         """
         for bot_info in await self.get_bots():
             if bot_info.get("uid") == bot_uid:
                 return bot_info
         return None
 
-    async def find_bot_by_slug(self, bot_slug: str) -> Optional[BotSchema]:
+    async def find_bot_by_slug(self, bot_slug: str) -> Optional[dict]:
         """
         Searches for a bot by its slug in the bot list.
 
         :param bot_slug: The slug of the bot to search for.
         :type bot_slug: str
-        :return: bot dict
-        :rtype: BotSchema | None
+        :return: bot dict (BotSchema).
+        :rtype: dict|None
         """
         for bot_info in await self.get_bots():
             if bot_info.get("slug") == bot_slug:
                 return bot_info
         return None
 
-    async def find_bot_by_name(self, bot_name: str) -> Optional[BotSchema]:
+    async def find_bot_by_name(self, bot_name: str) -> Optional[dict]:
         """
         Searches for a bot by its name in the bot list.
 
         :param bot_name: The name of the bot to search for.
         :type bot_name: str
-        :return: bot dict
-        :rtype: BotSchema | None
+        :return: bot dict (BotSchema).
+        :rtype: dict|None
         """
         for bot_info in await self.get_bots():
             if bot_info.get("name") == bot_name:
@@ -421,7 +420,7 @@ class ABLTApi:
         user_id: str = "-1",
         start_date: str = datetime.now().strftime("%Y-%m-%d"),
         end_date: str = datetime.now().strftime("%Y-%m-%d"),
-    ) -> Optional[StatisticsSchema]:
+    ) -> Optional[dict]:
         """
         Retrieves usage statistics for the API.
 
@@ -431,8 +430,8 @@ class ABLTApi:
         :type start_date: str
         :param end_date: The end date for the statistics in format YYYY-MM-DD.
         :type end_date: str
-        :return: The response message from the bot or None in case of an error.
-        :rtype: StatisticsSchema | None
+        :return: The response message from the bot (StatisticsSchema) or None in case of an error.
+        :rtype: dict|None
         """
         url, headers = self.__get_url_and_headers("v1/user/usage-statistics")
         payload = {"user_id": user_id, "start_date": start_date, "end_date": end_date}
@@ -448,7 +447,7 @@ class ABLTApi:
                     self.__logger.error("Error text: %s", await response.text())
                 return None
 
-    async def get_statistics_for_a_day(self, user_id: str, date: str) -> Optional[StatisticItemSchema]:
+    async def get_statistics_for_a_day(self, user_id: str, date: str) -> Optional[dict]:
         """
         Retrieves usage statistics for the API.
 
@@ -457,7 +456,7 @@ class ABLTApi:
         :param date: day for which statistics are needed. It should be in format YYYY-MM-DD.
         :type date: str
         :return: dict with statistics for a day.
-        :rtype: StatisticItemSchema | None.
+        :rtype: dict | None.
         """
         stats = await self.get_usage_statistics(user_id=user_id, start_date=date, end_date=date)
         if stats:
@@ -467,7 +466,7 @@ class ABLTApi:
                     return usage_info
         return None
 
-    async def get_statistics_total(self, user_id: str, start_date: str, end_date: str) -> StatisticTotalSchema:
+    async def get_statistics_total(self, user_id: str, start_date: str, end_date: str) -> dict:
         """
         Retrieves usage statistics for the API.
 
@@ -477,8 +476,8 @@ class ABLTApi:
         :type start_date: str
         :param end_date: end date for statistics.
         :type end_date: str
-        :return: dict with total statistics.
-        :rtype: StatisticTotalSchema.
+        :return: dict (StatisticTotalSchema) with total statistics.
+        :rtype: dict
         """
         stats = await self.get_usage_statistics(user_id=user_id, start_date=start_date, end_date=end_date)
         return stats.get("total") if stats is not None else None
