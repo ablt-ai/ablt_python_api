@@ -11,15 +11,14 @@ Description:
 This file contains pytest fixtures.
 """
 
+import random
+from datetime import datetime, timedelta
 from os import environ
 
 import pytest
 
 from src.ablt_python_api.ablt_api_async import ABLTApi
 from .test_data import sslcontext
-
-import random
-from datetime import datetime, timedelta
 
 
 @pytest.fixture(scope="session")
