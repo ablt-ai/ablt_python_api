@@ -466,7 +466,7 @@ class ABLTApi:
                     return usage_info
         return None
 
-    async def get_statistics_total(self, user_id: str, start_date: str, end_date: str) -> dict:
+    async def get_statistics_total(self, user_id: str, start_date: str, end_date: str) -> Optional[dict]:
         """
         Retrieves usage statistics for the API.
 
