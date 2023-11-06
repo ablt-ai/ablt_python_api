@@ -420,8 +420,8 @@ class ABLTApi:
     async def get_usage_statistics(
         self,
         user_id: str = "-1",
-        start_date: str = None,
-        end_date: str = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> Optional[dict]:
         """
         Retrieves usage statistics for the API.
