@@ -89,5 +89,3 @@ ensured_bots = (
         "avatar_url": "https://strapi-ablt.s3.amazonaws.com/thumbnail_666201_3b63097729.jpg",
     },
 )
-
-
