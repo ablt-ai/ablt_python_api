@@ -8,7 +8,7 @@ Created: 06.11.2023
 Last Modified: 06.11.2023
 
 Description:
-This file contains an implementation of class for aBLT chat API.
+This file contains schemas for aBLT.ai API.
 """
 
 from datetime import date

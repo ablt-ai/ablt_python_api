@@ -453,7 +453,7 @@ class ABLTApi:
 
     async def get_statistics_for_a_day(self, user_id: str, date: str) -> Optional[dict]:
         """
-        Retrieves usage statistics for the API.
+        Retrieves usage statistics for the API: only statistics for a day.
 
         :param user_id: The id of the user to get statistics for.
         :type user_id: str
@@ -473,7 +473,7 @@ class ABLTApi:
 
     async def get_statistics_total(self, user_id: str, start_date: str, end_date: str) -> Optional[dict]:
         """
-        Retrieves usage statistics for the API.
+        Retrieves usage statistics for the API: only total statistics.
 
         :param user_id: The id of the user to get statistics for.
         :type user_id: int
