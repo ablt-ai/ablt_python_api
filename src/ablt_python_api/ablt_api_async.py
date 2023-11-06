@@ -16,6 +16,7 @@ import json
 import logging
 import ssl
 from datetime import datetime
+from os import environ
 from time import sleep
 from typing import Optional, List, Dict
 
@@ -30,11 +31,11 @@ class ABLTApi:
     """aBLT Chat API master class"""
 
     def __init__(
-        self,
-        bearer_token: str,
-        base_api_url: str = "https://api.ablt.ai",
-        logger: Optional[logging.Logger] = None,
-        ssl_context: Optional[ssl.SSLContext] = None,
+            self,
+            bearer_token: Optional[str] = None,
+            base_api_url: str = "https://api.ablt.ai",
+            logger: Optional[logging.Logger] = None,
+            ssl_context: Optional[ssl.SSLContext] = None,
     ):
         """
         Initializes the object with the provided base API URL and bearer token.
@@ -49,7 +50,13 @@ class ABLTApi:
         :type ssl_context: ssl.SSLContext
         """
         self.__base_api_url = base_api_url
-        self.__bearer_token = bearer_token
+        if not bearer_token:
+            if environ.get("ABLT_BEARER_TOKEN"):
+                self.__bearer_token = environ["ABLT_BEARER_TOKEN"]
+            else:
+                raise TypeError("Bearer token is required!")
+        else:
+            self.__bearer_token = bearer_token
         self.__ssl_context = ssl_context
         if logger:
             self.__logger = logger
@@ -144,17 +151,17 @@ class ABLTApi:
 
     # pylint: disable=R0914,R0912,R0915
     async def chat(
-        self,
-        bot_uid: Optional[str] = None,
-        bot_slug: Optional[str] = None,
-        prompt: Optional[str] = None,
-        messages=None,
-        stream: Optional[bool] = False,
-        user: Optional[str] = None,
-        language: Optional[str] = None,
-        assumptions: Optional[dict] = None,
-        max_words: Optional[int] = None,
-        use_search: Optional[bool] = False,
+            self,
+            bot_uid: Optional[str] = None,
+            bot_slug: Optional[str] = None,
+            prompt: Optional[str] = None,
+            messages=None,
+            stream: Optional[bool] = False,
+            user: Optional[str] = None,
+            language: Optional[str] = None,
+            assumptions: Optional[dict] = None,
+            max_words: Optional[int] = None,
+            use_search: Optional[bool] = False,
     ):
         """
         Sends a chat request to the API and returns the response.
@@ -410,10 +417,10 @@ class ABLTApi:
         return None
 
     async def get_usage_statistics(
-        self,
-        user_id: str = "-1",
-        start_date: str = datetime.now().strftime("%Y-%m-%d"),
-        end_date: str = datetime.now().strftime("%Y-%m-%d"),
+            self,
+            user_id: str = "-1",
+            start_date: str = datetime.now().strftime("%Y-%m-%d"),
+            end_date: str = datetime.now().strftime("%Y-%m-%d"),
     ) -> Optional[StatisticsSchema]:
         """
         Retrieves usage statistics for the API.
@@ -441,17 +448,20 @@ class ABLTApi:
                     self.__logger.error("Error text: %s", await response.text())
                 return None
 
-    async def get_statistics_for_a_day(self, day: str) -> Optional[StatisticItemSchema]:
+    async def get_statistics_for_a_day(self, user_id: str, date: str) -> Optional[StatisticItemSchema]:
         """
         Retrieves usage statistics for the API.
 
-        :param day: day for which statistics are needed. It should be in format YYYY-MM-DD.
+        :param user_id: The id of the user to get statistics for.
+        :type user_id: str
+        :param date: day for which statistics are needed. It should be in format YYYY-MM-DD.
+        :type date: str
         :return: dict with statistics for a day.
         :rtype: StatisticItemSchema | None.
         """
-        items = (await self.get_usage_statistics(start_date=day, end_date=day)).get("items")
-        for usage_info in await items:
-            if usage_info.get("date") == day:
+        items = (await self.get_usage_statistics(user_id=user_id, start_date=date, end_date=date)).get("items")
+        for usage_info in items:
+            if usage_info.get("date") == date:
                 return usage_info
         return None
 

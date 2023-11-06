@@ -30,7 +30,7 @@ def api():
     :return: ABLTApi instance
     :rtype: ABLTApi
     """
-    return ABLTApi(bearer_token=environ["BEARER_TOKEN"], ssl_context=sslcontext)
+    return ABLTApi(bearer_token=environ["ABLT_BEARER_TOKEN"], ssl_context=sslcontext)
 
 
 @pytest.fixture()

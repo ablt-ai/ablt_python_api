@@ -10,10 +10,10 @@ Last Modified: 06.11.2023
 Description:
 This file tests for async constructor.
 """
-
-from secrets import token_hex
 from logging import INFO
+from os import environ
 from random import choice
+from secrets import token_hex
 
 import pytest
 from aiohttp import client_exceptions
@@ -24,8 +24,22 @@ from tests.test_data import sslcontext, KEY_LENGTH
 
 def test_async_constructor_without_token():
     """Test against constructor without token."""
+    environ["ABLT_BEARER_TOKEN"] = ""
     with pytest.raises(TypeError):
-        ABLTApi()  # pylint: disable=E1120
+        ABLTApi(ssl_context=sslcontext)
+
+
+def test_async_constructor_with_env_token(caplog):
+    """
+    Test against constructor without token.
+
+    :param caplog: caplog pytest fixture
+    """
+    environ["ABLT_BEARER_TOKEN"] = ""
+    with pytest.raises(TypeError):
+        ABLTApi(ssl_context=sslcontext)
+        assert "Logger for API now launched!" in caplog.text
+        assert "ABLT chat API is working like a charm" in caplog.text
 
 
 def test_async_constructor_default_init_with_any_token(caplog):
@@ -64,6 +78,4 @@ def test_async_constructor_default_init_with_invalid_url():
 def test_async_constructor_default_init_with_incorrect_logger():
     """Test against constructor with incorrect logger."""
     with pytest.raises(AttributeError):
-        ABLTApi(
-            bearer_token=token_hex(KEY_LENGTH), logger=token_hex(KEY_LENGTH), ssl_context=sslcontext
-        )
+        ABLTApi(bearer_token=token_hex(KEY_LENGTH), logger=token_hex(KEY_LENGTH), ssl_context=sslcontext)

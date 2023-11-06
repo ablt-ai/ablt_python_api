@@ -12,11 +12,12 @@ This file tests for async bots.
 """
 
 from random import choice
+from secrets import token_hex
 
 import pytest
 
 from src.ablt_python_api.schemas import BotSchema
-from tests.test_data import ensured_bots
+from tests.test_data import ensured_bots, KEY_LENGTH
 
 
 @pytest.mark.asyncio
@@ -90,3 +91,36 @@ async def test_async_bots_ensure_content(api):
     else:
         bot_data = next((bot for bot in await api.get_bots() if bot["uid"] == any_bot["uid"]), None)
     assert any_bot == bot_data
+
+
+@pytest.mark.asyncio
+async def test_async_bots_uid_not_exist(api):
+    """
+    This method tests for async bots: uid not exist.
+
+    :param api: api fixture
+    """
+    bot_by_uid = await api.find_bot_by_uid(bot_uid=choice(("", token_hex(KEY_LENGTH))))
+    assert bot_by_uid is None
+
+
+@pytest.mark.asyncio
+async def test_async_bots_slug_not_exist(api):
+    """
+    This method tests for async bots: slug not exist.
+
+    :param api: api fixture
+    """
+    bot_by_slug = await api.find_bot_by_slug(bot_slug=choice(("", token_hex(KEY_LENGTH))))
+    assert bot_by_slug is None
+
+
+@pytest.mark.asyncio
+async def test_async_bots_name_not_exist(api):
+    """
+    This method tests for async bots: name not exist.
+
+    :param api: api fixture
+    """
+    bot_by_name = await api.find_bot_by_name(bot_name=choice(("", token_hex(KEY_LENGTH))))
+    assert bot_by_name is None

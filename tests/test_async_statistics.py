@@ -11,14 +11,14 @@ Description:
 This file tests for async bots.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging import ERROR
 from random import randint, choice
 from secrets import token_hex
 
 import pytest
 
-from src.ablt_python_api.schemas import StatisticsSchema
+from src.ablt_python_api.schemas import StatisticsSchema, StatisticItemSchema, StatisticTotalSchema
 from tests.test_data import SOME_USER_ID_RANGE, DATE_TEST_PERIOD, KEY_LENGTH
 
 
@@ -128,10 +128,12 @@ async def test_async_statistics_specify_end_date_beforehand(api, random_date_gen
         ),
     ],
 )
-async def test_get_usage_statistics_with_malformed_payload(api, caplog, user_id, start_date, end_date, caplog_error):
+async def test_async_statistics_with_malformed_payload(api, caplog, user_id, start_date, end_date, caplog_error):
     """
     This method tests for async statistics: get statistics for user_id
+
     :param api: api fixture
+    :param caplog: caplog fixture
     :param user_id: user_id
     :type user_id: str
     :param start_date: start_date
@@ -144,3 +146,67 @@ async def test_get_usage_statistics_with_malformed_payload(api, caplog, user_id,
     assert response is None
     assert "Request error: 422" in caplog.text
     assert caplog_error in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_async_statistics_get_item(api, random_date_generator):
+    """
+    This method tests for async statistics: for a day
+
+    :param api:
+    :param caplog:
+    :return:
+    """
+    random_date = random_date_generator(days=DATE_TEST_PERIOD)
+    response = StatisticItemSchema.model_validate(await api.get_statistics_for_a_day(user_id=token_hex(KEY_LENGTH),
+                                                                                     date=random_date))
+    response = StatisticItemSchema.model_validate(response)
+    assert response.date.strftime("%Y-%m-%d") == random_date
+
+
+@pytest.mark.asyncio
+async def test_async_statistics_get_total(api, random_date_generator):
+    """
+    This method tests for async statistics: for totals
+
+    :param api: api fixture
+    """
+    end_date = (datetime.now() - timedelta(days=randint(0, DATE_TEST_PERIOD))).strftime('%Y-%m-%d')
+    start_date = random_date_generator(days=DATE_TEST_PERIOD, end_date=datetime.strptime(end_date, "%Y-%m-%d"))
+    response = StatisticTotalSchema.model_validate(await api.get_statistics_total(user_id=token_hex(KEY_LENGTH),
+                                                                                  start_date=start_date,
+                                                                                  end_date=end_date))
+    assert StatisticTotalSchema.model_validate(response)
+
+
+@pytest.mark.asyncio
+async def test_async_statistics_content(api, random_date_generator):
+    """
+    This method tests for async statistics: content
+
+    :param api: api fixture
+    """
+    date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+    response = await api.get_usage_statistics(start_date=date, end_date=date)
+    expected = {'total':
+                    {'original_tokens': 0,
+                     'enchancement_tokens': 0,
+                     'response_tokens': 0,
+                     'total_tokens': 0,
+                     'original_words': 0,
+                     'enchancement_words': 0,
+                     'response_words': 0,
+                     'total_words': 0
+                     },
+                'items': [
+                    {
+                        'original_tokens': 0,
+                        'enchancement_tokens': 0,
+                        'response_tokens': 0,
+                        'total_tokens': 0,
+                        'original_words': 0,
+                        'enchancement_words': 0,
+                        'response_words': 0,
+                        'total_words': 0,
+                        'date': date}]}
+    assert response == expected
