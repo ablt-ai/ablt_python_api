@@ -111,7 +111,7 @@ class ABLTApi:
                             )
                     except ValueError:
                         self.__logger.error("Error text: %s", response.text)
-                        return False
+                    return False
                 else:
                     self.__logger.error("Request error: %s", response.status)
                     try:
@@ -461,9 +461,10 @@ class ABLTApi:
         stats = await self.get_usage_statistics(user_id=user_id, start_date=date, end_date=date)
         if stats:
             items = stats.get("items")
-            for usage_info in items:
-                if usage_info.get("date") == date:
-                    return usage_info
+            if items is not None:
+                for usage_info in items:
+                    if usage_info.get("date") == date:
+                        return usage_info
         return None
 
     async def get_statistics_total(self, user_id: str, start_date: str, end_date: str) -> Optional[dict]:
