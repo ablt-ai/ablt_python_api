@@ -18,7 +18,7 @@ import ssl
 from datetime import datetime
 from os import environ
 from time import sleep
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 import aiohttp
 
@@ -31,11 +31,11 @@ class ABLTApi:
     """aBLT Chat API master class"""
 
     def __init__(
-            self,
-            bearer_token: Optional[str] = None,
-            base_api_url: str = "https://api.ablt.ai",
-            logger: Optional[logging.Logger] = None,
-            ssl_context: Optional[ssl.SSLContext] = None,
+        self,
+        bearer_token: Optional[str] = None,
+        base_api_url: str = "https://api.ablt.ai",
+        logger: Optional[logging.Logger] = None,
+        ssl_context: Optional[ssl.SSLContext] = None,
     ):
         """
         Initializes the object with the provided base API URL and bearer token.
@@ -129,7 +129,7 @@ class ABLTApi:
                         self.__logger.error("Error text: %s", response.text)
                     return False
 
-    async def get_bots(self) -> Optional[List[Dict[str, BotSchema]]]:
+    async def get_bots(self) -> List[BotSchema]:
         """
         Retrieves all published bots.
 
@@ -151,17 +151,17 @@ class ABLTApi:
 
     # pylint: disable=R0914,R0912,R0915
     async def chat(
-            self,
-            bot_uid: Optional[str] = None,
-            bot_slug: Optional[str] = None,
-            prompt: Optional[str] = None,
-            messages=None,
-            stream: Optional[bool] = False,
-            user: Optional[str] = None,
-            language: Optional[str] = None,
-            assumptions: Optional[dict] = None,
-            max_words: Optional[int] = None,
-            use_search: Optional[bool] = False,
+        self,
+        bot_uid: Optional[str] = None,
+        bot_slug: Optional[str] = None,
+        prompt: Optional[str] = None,
+        messages=None,
+        stream: Optional[bool] = False,
+        user: Optional[str] = None,
+        language: Optional[str] = None,
+        assumptions: Optional[dict] = None,
+        max_words: Optional[int] = None,
+        use_search: Optional[bool] = False,
     ):
         """
         Sends a chat request to the API and returns the response.
@@ -417,10 +417,10 @@ class ABLTApi:
         return None
 
     async def get_usage_statistics(
-            self,
-            user_id: str = "-1",
-            start_date: str = datetime.now().strftime("%Y-%m-%d"),
-            end_date: str = datetime.now().strftime("%Y-%m-%d"),
+        self,
+        user_id: str = "-1",
+        start_date: str = datetime.now().strftime("%Y-%m-%d"),
+        end_date: str = datetime.now().strftime("%Y-%m-%d"),
     ) -> Optional[StatisticsSchema]:
         """
         Retrieves usage statistics for the API.
