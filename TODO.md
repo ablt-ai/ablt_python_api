@@ -1,3 +1,2 @@
 - Add sync api
 - Add more tests
-- Move pytest requirements to dev-requirements.txt / linters calls
