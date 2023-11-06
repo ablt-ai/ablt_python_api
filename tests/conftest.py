@@ -14,6 +14,7 @@ This file contains pytest fixtures.
 import random
 from datetime import datetime, timedelta
 from os import environ
+from typing import Optional
 
 import pytest
 
@@ -41,7 +42,7 @@ def random_date_generator():
     :rtype: function
     """
 
-    def _generate_random_date(days: int, end_date: None, forward: bool = False):
+    def _generate_random_date(days: int, end_date: Optional[datetime] = None, forward: bool = False):
         """
         This function generates random date.
 
@@ -74,7 +75,7 @@ def days_between_dates():
     :rtype: function
     """
 
-    def _days_between_dates(start_date_str: str, end_date_str: str):
+    def _days_between_dates(start_date_str: str, end_date_str: Optional[str] = None):
         """
         This function calculates days between two dates.
 
