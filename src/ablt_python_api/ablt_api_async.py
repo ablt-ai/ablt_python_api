@@ -225,6 +225,7 @@ class ABLTApi:
             **({"messages": messages} if messages is not None else {}),
             **({"user": user} if user is not None else {}),
         }
+        print(payload)
 
         async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload, ssl=self.__ssl_context) as response:

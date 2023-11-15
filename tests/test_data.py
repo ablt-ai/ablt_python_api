@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 06.11.2023
+Last Modified: 15.11.2023
 
 Description:
 This file contains data for tests.
@@ -56,7 +56,7 @@ sample_questions = (
     "Where can I find the best pizza in New York?",
 )
 KEY_LENGTH = randint(8, 32)
-MIN_WORDS = 3
+MIN_WORDS = 5
 SOME_USER_ID_RANGE = 65536
 DATE_TEST_PERIOD = 365
 
@@ -89,3 +89,130 @@ ensured_bots = (
         "avatar_url": "https://strapi-ablt.s3.amazonaws.com/thumbnail_666201_3b63097729.jpg",
     },
 )
+sample_messages = [
+    {
+        "message": [
+            {"content": "My name is Iliya", "role": "user"},
+            {"content": "Hello, Iliya", "role": "assistant"},
+            {"content": "Tell me my name, please", "role": "user"},
+        ],
+        "expected_answer": "Iliya",
+    },
+    {
+        "message": [
+            {"content": "I live in Novi Sad, Serbia", "role": "user"},
+            {"content": "Hello, that's nice city!", "role": "assistant"},
+            {"content": "Do you know where I live?", "role": "user"},
+        ],
+        "expected_answer": "Novi Sad",
+    },
+    {
+        "message": [
+            {"content": "I like to eat pizza", "role": "user"},
+            {"content": "Hello, I like pizza too!", "role": "assistant"},
+            {"content": "What do I like to eat?", "role": "user"},
+        ],
+        "expected_answer": "pizza",
+    },
+    {
+        "message": [
+            {"content": "I like to eat pizza", "role": "user"},
+            {"content": "Hello, I like pizza too!", "role": "assistant"},
+            {"content": "What do I like to eat?", "role": "user"},
+        ],
+        "expected_answer": "pizza",
+    },
+    {
+        "message": [
+            {"content": "I like to eat pizza", "role": "user"},
+            {"content": "Hello, I like pizza too!", "role": "assistant"},
+            {"content": "What do I like to eat?", "role": "user"},
+        ],
+        "expected_answer": "pizza",
+    },
+    {
+        "message": [
+            {"content": "My hobby is hiking", "role": "user"},
+            {"content": "Hello, I like traveling too!", "role": "assistant"},
+            {"content": "What is my hobby?", "role": "user"},
+        ],
+        "expected_answer": "hiking",
+    },
+    {
+        "message": [
+            {"content": "I like to eat pizza", "role": "user"},
+            {"content": "Hello, I like pizza too!", "role": "assistant"},
+            {"content": "What do I like to eat?", "role": "user"},
+        ],
+        "expected_answer": "pizza",
+    },
+    {
+        "message": [
+            {"content": "I like to eat pizza", "role": "user"},
+            {"content": "Hello, I like pizza too!", "role": "assistant"},
+            {"content": "What do I like to eat?", "role": "user"},
+        ],
+        "expected_answer": "pizza",
+    },
+    {
+        "message": [
+            {"content": "I like to eat pizza", "role": "user"},
+            {"content": "Hello, I like pizza too!", "role": "assistant"},
+            {"content": "What do I like to eat?", "role": "user"},
+        ],
+        "expected_answer": "pizza",
+    },
+    {
+        "message": [
+            {"content": "My favourite book is 'The Sirens of Titan'", "role": "user"},
+            {"content": "Oh, seems you really lice science fiction!", "role": "assistant"},
+            {"content": "Who is author of my favourite book?", "role": "user"},
+        ],
+        "expected_answer": "Vonnegut",
+    },
+]
+LANGUAGES = ("Arabic", "French", "English", "Spanish", "Russian")
+language_questions = [
+    {
+        "question": {
+            "English": "Answer me in one word: name the largest mammal on Earth?",
+            "French": "Répondez-moi en un mot: nommez le plus grand mammifère sur Terre?",
+            "Spanish": "Respóndeme en una palabra: ¿cómo se llama el mamífero más grande de la Tierra?",
+            "Russian": "Ответьте мне одним словом: назовите самое большое млекопитающее на Земле?",
+            "Arabic": "أجبني بكلمة واحدة: اسم أكبر حيوان ثديي على الأرض؟",
+        },
+        "answer": {
+            "English": "whale",
+            "French": "baleine",
+            "Spanish": "ballena",
+            "Russian": "кит",
+            "Arabic": "كيت",
+        },
+    },
+    {
+        "question": {
+            "English": "Answer me in one word: what is the name of the second planet from the Sun?",
+            "French": "Répondez-moi en un mot: quel est le nom de la deuxième planète du Soleil?",
+            "Spanish": "Respóndeme en una palabra: ¿cómo se llama el segundo planeta desde el Sol?",
+            "Russian": "Ответьте мне одним словом: как называется вторая планета от Солнца?",
+            "Arabic": "أجبني بكلمة واحدة: ما اسم الكوكب الثاني من الشمس؟",
+        },
+        "answer": {"English": "venus", "French": "vénus", "Spanish": "venus", "Russian": "венера", "Arabic": "الزهرة"},
+    },
+    {
+        "question": {
+            "English": "Answer me in one word: what is the name of the smartest girl, friend of Harry Potter?",
+            "French": "Répondez-moi en un mot: quel est le nom de la fille la plus intelligente, amie de Harry Potter?",
+            "Spanish": "Respóndeme en una palabra: ¿cómo se llama la chica más inteligente, amiga de Harry Potter?",
+            "Russian": "Ответьте мне одним словом: как зовут самую умную девочку, подругу Гарри Поттера?",
+            "Arabic": "أجبني بكلمة واحدة: ما اسم الفتاة الأذكى صديقة هاري بوتر؟",
+        },
+        "answer": {
+            "English": "hermione",
+            "French": "hermione",
+            "Spanish": "hermione",
+            "Russian": "гермиона",
+            "Arabic": "هيرميون",
+        },
+    },
+]

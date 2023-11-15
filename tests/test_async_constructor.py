@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 06.11.2023
+Last Modified: 15.11.2023
 
 Description:
 This file tests for async constructor.
@@ -37,6 +37,7 @@ def test_async_constructor_with_env_token(caplog):
 
     :param caplog: caplog pytest fixture
     """
+    caplog.set_level(INFO)
     ABLTApi(ssl_context=sslcontext)
     assert "Logger for API now launched!" in caplog.text
     assert "ABLT chat API is working like a charm" in caplog.text
@@ -48,6 +49,7 @@ def test_async_constructor_default_init_with_any_token(caplog):
 
     :param caplog: caplog pytest fixture
     """
+    caplog.set_level(INFO)
     ABLTApi(bearer_token=token_hex(KEY_LENGTH), ssl_context=sslcontext)
     assert "Logger for API now launched!" in caplog.text
     assert "ABLT chat API is working like a charm" in caplog.text
