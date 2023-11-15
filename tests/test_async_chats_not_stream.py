@@ -10,7 +10,7 @@ Last Modified: 15.11.2023
 Description:
 This file tests for async chats (non-streaming mode).
 """
-
+# pylint: disable=R0801
 from logging import ERROR
 from random import choice, randint
 from secrets import token_hex
