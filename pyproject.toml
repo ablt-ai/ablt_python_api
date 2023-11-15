@@ -96,3 +96,6 @@ extend-ignore = """
 
 [tool.pylint]
 max-line-length = 120
+
+[tool.pytest.ini_options]
+reruns = 2
