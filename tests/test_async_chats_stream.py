@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Filename: test_async_chats_not_stream.py
+Filename: test_async_chats_stream.py
 Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
-Created: 03.11.2023
+Created: 15.11.2023
 Last Modified: 15.11.2023
 
 Description:
-This file tests for async chats (non-streaming mode).
+This file tests for async chats (streaming mode).
 """
 
 from logging import ERROR
@@ -18,6 +18,7 @@ from secrets import token_hex
 import pytest
 
 from src.ablt_python_api.schemas import BotSchema, StatisticsSchema
+from src.ablt_python_api.utils.exceptions import DoneException
 from tests.test_data import sample_questions, MIN_WORDS, sample_messages, LANGUAGES, language_questions
 
 
@@ -25,18 +26,22 @@ async def get_full_response(async_generator):
     """
     This method gets full response from async generator
 
-    :param async_generator: async generator
+    :param async_generator:
     :return: str, full response
     """
+    full_response = []
     try:
-        response = await async_generator.__anext__()  # pylint: disable=C2801
-    except StopAsyncIteration:
-        response = None
-    return response
+        async for response in async_generator:
+            assert response is not None
+            full_response.append(response)
+    except (StopAsyncIteration, DoneException):
+        pass
+    full_response = "".join(full_response) if len(full_response) > 0 else None
+    return full_response
 
 
 @pytest.mark.asyncio
-async def test_async_chats_not_stream_missed_bot_info(api, caplog):
+async def test_async_chats_stream_missed_bot_info(api, caplog):
     """
     This method tests for async chat missed any bot info
 
@@ -44,13 +49,13 @@ async def test_async_chats_not_stream_missed_bot_info(api, caplog):
     :param caplog: caplog pytest fixture
     """
     caplog.set_level(ERROR)
-    async_generator = api.chat(prompt=choice(sample_questions), max_words=MIN_WORDS, stream=False)
+    async_generator = api.chat(prompt=choice(sample_questions), max_words=MIN_WORDS, stream=True)
     response = await get_full_response(async_generator)
     assert response is None and "Error: Only one param is required ('bot_slug' or 'bot_uid')" in caplog.text
 
 
 @pytest.mark.asyncio
-async def test_async_chats_not_stream_both_bot_ids_provided(api, caplog):
+async def test_async_chats_stream_both_bot_ids_provided(api, caplog):
     """
     This method tests for async chat use messages with prompt at same time
 
@@ -60,44 +65,40 @@ async def test_async_chats_not_stream_both_bot_ids_provided(api, caplog):
     caplog.set_level(ERROR)
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
     async_generator = api.chat(
-        bot_uid=bot.uid,
-        bot_slug=bot.slug,
-        prompt=choice(sample_questions),
-        max_words=MIN_WORDS,
-        stream=False,
+        bot_uid=bot.uid, bot_slug=bot.slug, prompt=choice(sample_questions), max_words=MIN_WORDS, stream=True
     )
     response = await get_full_response(async_generator)
     assert response is None and "Error: Only one param is required ('bot_slug' or 'bot_uid')" in caplog.text
 
 
 @pytest.mark.asyncio
-async def test_async_chats_not_stream_bot_selection_by_slug(api):
+async def test_async_chats_stream_bot_selection_by_slug(api):
     """
     This method tests for async chatbot selection by slug
 
     :param api: api fixture (returns ABLTApi instance)
     """
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
-    async_generator = api.chat(bot_slug=bot.slug, prompt="What is your name?", max_words=MIN_WORDS, stream=False)
+    async_generator = api.chat(bot_slug=bot.slug, prompt="What is your name?", max_words=MIN_WORDS, stream=True)
     response = await get_full_response(async_generator)
     assert bot.name.replace(" Bot", "").replace(" Template", "").lower() in response.lower()
 
 
 @pytest.mark.asyncio
-async def test_async_chats_not_stream_bot_selection_by_uid(api):
+async def test_async_chats_stream_bot_selection_by_uid(api):
     """
     This method tests for async chatbot selection by uid
 
     :param api: api fixture (returns ABLTApi instance)
     """
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
-    async_generator = api.chat(bot_uid=bot.uid, prompt="What is your name?", max_words=MIN_WORDS, stream=False)
+    async_generator = api.chat(bot_uid=bot.uid, prompt="What is your name?", max_words=MIN_WORDS, stream=True)
     response = await get_full_response(async_generator)
     assert bot.name.replace(" Bot", "").replace(" Template", "").lower() in response.lower()
 
 
 @pytest.mark.asyncio
-async def test_async_chats_not_stream_missed_input(api, caplog):
+async def test_async_chats_stream_missed_input(api, caplog):
     """
     This method tests for async chat use messages instead of prompt
 
@@ -106,13 +107,13 @@ async def test_async_chats_not_stream_missed_input(api, caplog):
     """
     caplog.set_level(ERROR)
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
-    async_generator = api.chat(bot_uid=bot.uid, max_words=MIN_WORDS, stream=False)
+    async_generator = api.chat(bot_uid=bot.uid, max_words=MIN_WORDS, stream=True)
     response = await get_full_response(async_generator)
     assert response is None and "Error: Only one param is required ('prompt' or 'messages')" in caplog.text
 
 
 @pytest.mark.asyncio
-async def test_async_chats_not_stream_both_input_provided(api, caplog):
+async def test_async_chats_stream_both_input_provided(api, caplog):
     """
     This method tests for async chat use messages with prompt at same time
 
@@ -126,14 +127,14 @@ async def test_async_chats_not_stream_both_input_provided(api, caplog):
         messages=choice(sample_messages),
         prompt=choice(sample_questions),
         max_words=MIN_WORDS,
-        stream=False,
+        stream=True,
     )
     response = await get_full_response(async_generator)
     assert response is None and "Error: Only one param is required ('prompt' or 'messages')" in caplog.text
 
 
 @pytest.mark.asyncio
-async def test_async_chats_not_stream_use_messages(api):
+async def test_async_chats_stream_use_messages(api):
     """
     This method tests for async chat use messages instead of prompt
 
@@ -141,14 +142,14 @@ async def test_async_chats_not_stream_use_messages(api):
     """
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
     messages = choice(sample_messages)
-    async_generator = api.chat(bot_uid=bot.uid, messages=messages["message"], max_words=MIN_WORDS, stream=False)
+    async_generator = api.chat(bot_uid=bot.uid, messages=messages["message"], max_words=MIN_WORDS, stream=True)
     response = await get_full_response(async_generator)
     assert messages["expected_answer"] in response
 
 
 @pytest.mark.xfail(reason="BUG: Statistics always returns 0")
 @pytest.mark.asyncio
-async def test_async_chats_not_stream_specify_user(api):
+async def test_async_chats_stream_specify_user(api):
     """
     This method tests for async chat specify user
 
@@ -163,7 +164,7 @@ async def test_async_chats_not_stream_specify_user(api):
         bot_uid=bot.uid,
         prompt=choice(sample_questions),
         max_words=MIN_WORDS,
-        stream=False,
+        stream=True,
         user=user_id,
     )
     response = await get_full_response(async_generator)
@@ -176,7 +177,7 @@ async def test_async_chats_not_stream_specify_user(api):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("language", LANGUAGES, ids=LANGUAGES)
-async def test_async_chats_not_stream_check_language(api, language):
+async def test_async_chats_stream_check_language(api, language):
     """
     This method tests for async chat specify user and messages
 
@@ -186,11 +187,7 @@ async def test_async_chats_not_stream_check_language(api, language):
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
     question = choice(language_questions)
     async_generator = api.chat(
-        bot_uid=bot.uid,
-        prompt=question["question"][language],
-        language=language,
-        max_words=MIN_WORDS,
-        stream=False,
+        bot_uid=bot.uid, prompt=question["question"][language], language=language, max_words=MIN_WORDS, stream=True
     )
     response = await get_full_response(async_generator)
     assert question["answer"][language] in response.lower()
@@ -198,7 +195,7 @@ async def test_async_chats_not_stream_check_language(api, language):
 
 @pytest.mark.xfail(reason="RESEARCH: Token to word recalculation gives different results")
 @pytest.mark.asyncio
-async def test_async_chats_not_stream_max_words(api):
+async def test_async_chats_stream_max_words(api):
     """
     This method tests for async chat max words
 
@@ -206,11 +203,6 @@ async def test_async_chats_not_stream_max_words(api):
     """
     max_words = randint(3, 10)
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
-    async_generator = api.chat(
-        bot_uid=bot.uid,
-        prompt=choice(sample_questions),
-        max_words=max_words,
-        stream=False,
-    )
+    async_generator = api.chat(bot_uid=bot.uid, prompt=choice(sample_questions), max_words=max_words, stream=True)
     response = await get_full_response(async_generator)
     assert len(response.split()) <= max_words
