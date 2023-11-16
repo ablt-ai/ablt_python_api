@@ -147,7 +147,9 @@ class ABLTApi:
                     error_data = await response.json()
                     self.__logger.error("Error for %s details: %s", response.headers.get("x-request-id"), error_data)
                 except ValueError:
-                    self.__logger.error("Error %s text: %s", response.headers.get("x-request-id"), await response.text())
+                    self.__logger.error(
+                        "Error %s text: %s", response.headers.get("x-request-id"), await response.text()
+                    )
                 return []
 
     # pylint: disable=R0914,R0912,R0915
@@ -260,8 +262,11 @@ class ABLTApi:
                         elif "content" in response_json:
                             message = response_json.get("content")
                         else:
-                            self.__logger.error("Response malformed! Actual response for %s is: %s",
-                                                response.headers.get("x-request-id"), response_json)
+                            self.__logger.error(
+                                "Response malformed! Actual response for %s is: %s",
+                                response.headers.get("x-request-id"),
+                                response_json,
+                            )
                             return
                         yield message
                 else:
