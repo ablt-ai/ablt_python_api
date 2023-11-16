@@ -133,20 +133,25 @@ class ABLTApi:
                     if data.get("status") == "ok":
                         self.__logger.info("ABLT chat API is working like a charm")
                         return True
-                    self.__logger.error("Error for %s: %s", response.headers.get("x-request-id"), data.get("status"))
+                    self.__logger.error("Error: %s", data.get("status"))
                     try:
-                        self.__logger.error("Error details for %s:", response.headers.get("x-request-id"))
+                        self.__logger.error("Error details:")
                         for error in data["detail"]:
                             self.__logger.error(
                                 "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
                             )
+                        self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
                     except ValueError:
-                        self.__logger.error("Error text: %s", response.text)
+                        self.__logger.error(
+                            "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
+                        )
                     return False
-                self.__logger.error("Request error for %s: %s", response.headers.get("x-request-id"), response.status)
+                self.__logger.error(
+                    "Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id")
+                )
                 try:
                     error_data = await response.json()
-                    self.__logger.error("Error details for %s:", response.headers.get("x-request-id"))
+                    self.__logger.error("Error details:")
                     for original_error in error_data["detail"]:
                         self.__logger.error(
                             "  - %s (type: %s, location: %s)",
@@ -154,8 +159,9 @@ class ABLTApi:
                             original_error["type"],
                             original_error["loc"],
                         )
+                    self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
                 except (ValueError, aiohttp.ContentTypeError):
-                    self.__logger.error("Error for %s text: %s", response.headers.get("x-request-id"), response.text)
+                    self.__logger.error("Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id"))
                 return False
 
     async def get_bots(self) -> list[dict]:
@@ -170,13 +176,13 @@ class ABLTApi:
             async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     return await response.json()
-                self.__logger.error("Request %s error: %s", response.headers.get("x-request-id"), response.status)
+                self.__logger.error("Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id"))
                 try:
                     error_data = await response.json()
-                    self.__logger.error("Error for %s details: %s", response.headers.get("x-request-id"), error_data)
+                    self.__logger.error("Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id"))
                 except (ValueError, aiohttp.ContentTypeError):
                     self.__logger.error(
-                        "Error %s text: %s", response.headers.get("x-request-id"), await response.text()
+                        "Error text: %s, x-request-id: %s", await response.text(), response.headers.get("x-request-id")
                     )
                 return []
 
@@ -291,17 +297,17 @@ class ABLTApi:
                             message = response_json.get("content")
                         else:
                             self.__logger.error(
-                                "Response malformed! Actual response for %s is: %s",
-                                response.headers.get("x-request-id"),
+                                "Response malformed! Actual response is: %s, x-request-id: %s",
                                 response_json,
+                                response.headers.get("x-request-id"),
                             )
                             return
                         yield message
                 else:
-                    self.__logger.error("Error for %s: %s", response.headers.get("x-request-id"), response.status)
+                    self.__logger.error("Error: %s", response.status)
                     try:
                         error_data = await response.json()
-                        self.__logger.error("Error details for %s:", response.headers.get("x-request-id"))
+                        self.__logger.error("Error details:")
                         if isinstance(error_data["detail"], str):
                             self.__logger.error("  - %s", error_data["detail"])
                         else:
@@ -312,9 +318,10 @@ class ABLTApi:
                                     )
                                 else:
                                     self.__logger.error("  - %s", error)
+                        self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
                     except (ValueError, aiohttp.ContentTypeError):
                         error_text = await response.text()
-                        self.__logger.error("Error for %s text: %s", response.headers.get("x-request-id"), error_text)
+                        self.__logger.error("Error text: %s, x-request-id: %s", error_text, response.headers.get("x-request-id"))
                     return
 
     async def update_api(self) -> None:
@@ -448,13 +455,17 @@ class ABLTApi:
             async with session.post(url, json=payload, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     return await response.json()
-                self.__logger.error("Request error for %s: %s", response.headers.get("x-request-id"), response.status)
+                self.__logger.error(
+                    "Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id")
+                )
                 try:
                     error_data = await response.json()
-                    self.__logger.error("Error details for %s: %s", response.headers.get("x-request-id"), error_data)
+                    self.__logger.error(
+                        "Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id")
+                    )
                 except (ValueError, aiohttp.ContentTypeError):
                     self.__logger.error(
-                        "Error text for %s: %s", response.headers.get("x-request-id"), await response.text()
+                        "Error text: %s, x-request-id: %s", await response.text(), response.headers.get("x-request-id")
                     )
                 return None
 
