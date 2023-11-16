@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 15.11.2023
+Last Modified: 16.11.2023
 
 Description:
 This file tests for async chats (non-streaming mode).
@@ -85,7 +85,9 @@ async def test_async_chats_not_stream_bot_selection_by_slug(api):
     :param api: api fixture (returns ABLTApi instance)
     """
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
-    async_generator = api.chat(bot_slug=bot.slug, prompt="What is your name?", max_words=MIN_WORDS, stream=False)
+    async_generator = api.chat(
+        bot_slug=bot.slug, prompt="What is your name? Answer just one word (name).", max_words=MIN_WORDS, stream=False
+    )
     response = await get_full_response(async_generator)
     assert bot.name.replace(" Bot", "").replace(" Template", "").lower() in response.lower()
 

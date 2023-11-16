@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 15.11.2023
+Last Modified: 16.11.2023
 
 Description:
 This file contains data for tests.
@@ -166,7 +166,7 @@ sample_messages = [
         "message": [
             {"content": "My favourite book is 'The Sirens of Titan'", "role": "user"},
             {"content": "Oh, seems you really lice science fiction!", "role": "assistant"},
-            {"content": "Who is author of my favourite book?", "role": "user"},
+            {"content": "Who is author of my favourite book? Tell me just and author.", "role": "user"},
         ],
         "expected_answer": "Vonnegut",
     },
@@ -186,7 +186,7 @@ language_questions = [
             "French": "baleine",
             "Spanish": "ballena",
             "Russian": "кит",
-            "Arabic": "كيت",
+            "Arabic": "حوت",
         },
     },
     {
