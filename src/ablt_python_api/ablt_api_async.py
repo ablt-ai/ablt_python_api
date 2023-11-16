@@ -77,6 +77,34 @@ class ABLTApi:
         else:
             loop.run_until_complete(self.update_api())
 
+    def get_base_api_url(self) -> str:
+        """
+        Returns the current base API URL as a string.
+
+        :return: The current base API URL as a string.
+        :rtype: str
+        """
+        return self.__base_api_url
+
+    def get_bearer_token(self) -> str:
+        """
+        Returns the current bearer token as a string.
+
+        :return: The current bearer token as a string.
+        :rtype: str
+        """
+        return self.__bearer_token
+
+    def set_logger(self, new_logger: logging.Logger):
+        """
+        Sets logger for API
+
+        Args:
+        :param new_logger: new logger
+        :type new_logger: logger
+        """
+        self.__logger = new_logger
+
     def __get_url_and_headers(self, endpoint: str) -> tuple[str, dict]:
         """
         Constructs the URL and headers for an API request.
@@ -352,34 +380,6 @@ class ABLTApi:
         if new_base_api_url:
             await self.set_base_api_url(new_base_api_url)
         await self.update_api()
-
-    def get_base_api_url(self) -> str:
-        """
-        Returns the current base API URL as a string.
-
-        :return: The current base API URL as a string.
-        :rtype: str
-        """
-        return self.__base_api_url
-
-    def get_bearer_token(self) -> str:
-        """
-        Returns the current bearer token as a string.
-
-        :return: The current bearer token as a string.
-        :rtype: str
-        """
-        return self.__bearer_token
-
-    def set_logger(self, new_logger: logging.Logger):
-        """
-        Sets logger for API
-
-        Args:
-        :param new_logger: new logger
-        :type new_logger: logger
-        """
-        self.__logger = new_logger
 
     async def find_bot_by_uid(self, bot_uid: str) -> Optional[dict]:
         """

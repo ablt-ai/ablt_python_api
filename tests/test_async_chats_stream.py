@@ -43,8 +43,7 @@ async def get_full_response(async_generator):
             full_response.append(response)
     except (StopAsyncIteration, DoneException):
         pass
-    full_response = "".join(full_response) if len(full_response) > 0 else None
-    return full_response
+    return "".join(full_response) if len(full_response) > 0 else None
 
 
 @pytest.mark.asyncio
