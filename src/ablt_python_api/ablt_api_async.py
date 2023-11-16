@@ -105,9 +105,9 @@ class ABLTApi:
                     if data.get("status") == "ok":
                         self.__logger.info("ABLT chat API is working like a charm")
                         return True
-                    self.__logger.error("Error: %s", data.get("status"))
+                    self.__logger.error("Error for %s: %s", response.headers.get("x-request-id"), data.get("status"))
                     try:
-                        self.__logger.error("Error details:")
+                        self.__logger.error("Error details for %s:", response.headers.get("x-request-id"))
                         for error in data["detail"]:
                             self.__logger.error(
                                 "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
@@ -115,10 +115,10 @@ class ABLTApi:
                     except ValueError:
                         self.__logger.error("Error text: %s", response.text)
                     return False
-                self.__logger.error("Request error: %s", response.status)
+                self.__logger.error("Request error for %s: %s", response.headers.get("x-request-id"), response.status)
                 try:
                     error_data = await response.json()
-                    self.__logger.error("Error details:")
+                    self.__logger.error("Error details for %s:", response.headers.get("x-request-id"))
                     for original_error in error_data["detail"]:
                         self.__logger.error(
                             "  - %s (type: %s, location: %s)",
@@ -127,7 +127,7 @@ class ABLTApi:
                             original_error["loc"],
                         )
                 except ValueError:
-                    self.__logger.error("Error text: %s", response.text)
+                    self.__logger.error("Error for %s text: %s", response.headers.get("x-request-id"), response.text)
                 return False
 
     async def get_bots(self) -> list[dict]:
@@ -142,12 +142,12 @@ class ABLTApi:
             async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     return await response.json()
-                self.__logger.error("Request error: %s", response.status)
+                self.__logger.error("Request %s error: %s", response.headers.get("x-request-id"), response.status)
                 try:
                     error_data = await response.json()
-                    self.__logger.error("Error details: %s", error_data)
+                    self.__logger.error("Error for %s details: %s", response.headers.get("x-request-id"), error_data)
                 except ValueError:
-                    self.__logger.error("Error text: %s", await response.text())
+                    self.__logger.error("Error %s text: %s", response.headers.get("x-request-id"), await response.text())
                 return []
 
     # pylint: disable=R0914,R0912,R0915
@@ -158,7 +158,7 @@ class ABLTApi:
         prompt: Optional[str] = None,
         messages=None,
         stream: Optional[bool] = False,
-        user: Optional[str] = None,
+        user_id: Optional[int] = None,
         language: Optional[str] = None,
         assumptions: Optional[dict] = None,
         max_words: Optional[int] = None,
@@ -178,8 +178,8 @@ class ABLTApi:
         :type messages: list[dict]
         :param stream: A flag for streaming mode (default is False).
         :type stream: bool
-        :param user: The user identifier.
-        :type user: str
+        :param user_id: The user identifier.
+        :type user_id: int
         :param language: The language of the chat, default is "English".
         :type language: str
         :param assumptions: The assumptions for the chat, default is None (TBD).
@@ -223,7 +223,7 @@ class ABLTApi:
             **({"assumptions": assumptions} if assumptions is not None else {}),
             **({"prompt": prompt} if prompt is not None else {}),
             **({"messages": messages} if messages is not None else {}),
-            **({"user": user} if user is not None else {}),
+            **({"user_id": user_id} if user_id is not None else {}),
         }
 
         async with aiohttp.ClientSession() as session:
@@ -260,15 +260,16 @@ class ABLTApi:
                         elif "content" in response_json:
                             message = response_json.get("content")
                         else:
-                            self.__logger.error("Response malformed! Actual response is: %s", response_json)
+                            self.__logger.error("Response malformed! Actual response for %s is: %s",
+                                                response.headers.get("x-request-id"), response_json)
                             return
                         yield message
                 else:
-                    self.__logger.error("Error: %s", response.status)
+                    self.__logger.error("Error for %s: %s", response.headers.get("x-request-id"), response.status)
                     try:
                         error_data = await response.json()
 
-                        self.__logger.error("Error details:")
+                        self.__logger.error("Error details for %s:", response.headers.get("x-request-id"))
                         if isinstance(error_data["detail"], str):
                             self.__logger.error("  - %s", error_data["detail"])
                         else:
@@ -281,7 +282,7 @@ class ABLTApi:
                                     self.__logger.error("  - %s", error)
                     except ValueError:
                         error_text = await response.text()
-                        self.__logger.error("Error text: %s", error_text)
+                        self.__logger.error("Error for %s text: %s", response.headers.get("x-request-id"), error_text)
                     return
 
     async def update_api(self) -> None:
@@ -419,7 +420,7 @@ class ABLTApi:
 
     async def get_usage_statistics(
         self,
-        user_id: str = "-1",
+        user_id: int = -1,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
     ) -> Optional[dict]:
@@ -427,7 +428,7 @@ class ABLTApi:
         Retrieves usage statistics for the API.
 
         :param user_id: The id of the user to get statistics for.
-        :type user_id: str
+        :type user_id: int
         :param start_date: The start date for the statistics in format YYYY-MM-DD.
         :type start_date: str
         :param end_date: The end date for the statistics in format YYYY-MM-DD.
@@ -443,20 +444,22 @@ class ABLTApi:
             async with session.post(url, json=payload, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     return await response.json()
-                self.__logger.error("Request error: %s", response.status)
+                self.__logger.error("Request error for %s: %s", response.headers.get("x-request-id"), response.status)
                 try:
                     error_data = await response.json()
-                    self.__logger.error("Error details: %s", error_data)
+                    self.__logger.error("Error details for %s: %s", response.headers.get("x-request-id"), error_data)
                 except ValueError:
-                    self.__logger.error("Error text: %s", await response.text())
+                    self.__logger.error(
+                        "Error text for %s: %s", response.headers.get("x-request-id"), await response.text()
+                    )
                 return None
 
-    async def get_statistics_for_a_day(self, user_id: str, date: str) -> Optional[dict]:
+    async def get_statistics_for_a_day(self, user_id: int, date: str) -> Optional[dict]:
         """
         Retrieves usage statistics for the API: only statistics for a day.
 
         :param user_id: The id of the user to get statistics for.
-        :type user_id: str
+        :type user_id: int
         :param date: day for which statistics are needed. It should be in format YYYY-MM-DD.
         :type date: str
         :return: dict with statistics for a day.
@@ -471,7 +474,7 @@ class ABLTApi:
                         return usage_info
         return None
 
-    async def get_statistics_total(self, user_id: str, start_date: str, end_date: str) -> Optional[dict]:
+    async def get_statistics_total(self, user_id: int, start_date: str, end_date: str) -> Optional[dict]:
         """
         Retrieves usage statistics for the API: only total statistics.
 

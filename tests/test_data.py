@@ -216,3 +216,5 @@ language_questions = [
         },
     },
 ]
+UPPER_USER_ID = 32768
+LOWER_USER_ID = -32767

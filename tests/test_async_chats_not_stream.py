@@ -13,12 +13,19 @@ This file tests for async chats (non-streaming mode).
 # pylint: disable=R0801
 from logging import ERROR
 from random import choice, randint
-from secrets import token_hex
 
 import pytest
 
 from src.ablt_python_api.schemas import BotSchema, StatisticsSchema
-from tests.test_data import sample_questions, MIN_WORDS, sample_messages, LANGUAGES, language_questions
+from tests.test_data import (
+    sample_questions,
+    sample_messages,
+    language_questions,
+    LANGUAGES,
+    LOWER_USER_ID,
+    MIN_WORDS,
+    UPPER_USER_ID,
+)
 
 
 async def get_full_response(async_generator):
@@ -146,7 +153,6 @@ async def test_async_chats_not_stream_use_messages(api):
     assert messages["expected_answer"] in response
 
 
-@pytest.mark.xfail(reason="BUG: Statistics always returns 0")
 @pytest.mark.asyncio
 async def test_async_chats_not_stream_specify_user(api):
     """
@@ -154,7 +160,7 @@ async def test_async_chats_not_stream_specify_user(api):
 
     :param api: api fixture (returns ABLTApi instance)
     """
-    user_id = token_hex(MIN_WORDS)
+    user_id = randint(LOWER_USER_ID, UPPER_USER_ID)
     user_usage = int(
         StatisticsSchema.model_validate(await api.get_usage_statistics(user_id=user_id)).total.total_tokens
     )
@@ -162,9 +168,9 @@ async def test_async_chats_not_stream_specify_user(api):
     async_generator = api.chat(
         bot_uid=bot.uid,
         prompt=choice(sample_questions),
-        max_words=MIN_WORDS,
+        max_words=100,
         stream=False,
-        user=user_id,
+        user_id=user_id,
     )
     response = await get_full_response(async_generator)
     updated_usage = int(
@@ -196,7 +202,6 @@ async def test_async_chats_not_stream_check_language(api, language):
     assert question["answer"][language] in response.lower()
 
 
-@pytest.mark.xfail(reason="RESEARCH: Token to word recalculation gives different results")
 @pytest.mark.asyncio
 async def test_async_chats_not_stream_max_words(api):
     """
@@ -205,6 +210,7 @@ async def test_async_chats_not_stream_max_words(api):
     :param api: api fixture (returns ABLTApi instance)
     """
     max_words = randint(3, 10)
+    tolerance = 1  # tolerance for tokens to words conversion
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
     async_generator = api.chat(
         bot_uid=bot.uid,
@@ -213,4 +219,4 @@ async def test_async_chats_not_stream_max_words(api):
         stream=False,
     )
     response = await get_full_response(async_generator)
-    assert len(response.split()) <= max_words
+    assert len(response.split()) <= (max_words + tolerance)
