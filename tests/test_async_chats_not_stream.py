@@ -231,4 +231,4 @@ async def test_async_chats_not_stream_use_search(api):
 
     :param api: api fixture (returns ABLTApi instance)
     """
-    return   # TBD
+    return api  # TBD

@@ -12,7 +12,6 @@ This file contains data for tests.
 """
 import ssl
 from random import randint
-from sys import maxsize
 
 sslcontext = ssl.create_default_context()
 sslcontext.check_hostname = False
