@@ -2,7 +2,6 @@
 max-line-length = 120
 max-name-length = 60
 max-module-members = 15
-max-cognitive-complexity = 10
 inline-quotes = "
 multiline-quotes = """
 docstring-quotes = """
