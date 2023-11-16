@@ -53,6 +53,8 @@ line-length = 120
 
 [tool.flake8]
 max-line-length = 120
+max-name-length = 60
+max-module-members = 15
 extend-ignore = """
     Q000,
     WPS306,

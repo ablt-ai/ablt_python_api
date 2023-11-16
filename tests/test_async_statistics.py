@@ -153,7 +153,7 @@ async def test_async_statistics_with_malformed_payload(api, caplog, user_id, sta
     caplog.set_level(ERROR)
     response = await api.get_usage_statistics(user_id=user_id, start_date=start_date, end_date=end_date)
     assert response is None
-    assert "Request error: 422" in caplog.text
+    assert "Request error: 422, x-request-id: " in caplog.text
     assert caplog_error in caplog.text
 
 

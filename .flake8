@@ -1,5 +1,7 @@
 [flake8]
 max-line-length = 120
+max-name-length = 60
+max-module-members = 15
 inline-quotes = "
 multiline-quotes = """
 docstring-quotes = """
