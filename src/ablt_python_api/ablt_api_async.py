@@ -154,7 +154,7 @@ class ABLTApi:
                             original_error["type"],
                             original_error["loc"],
                         )
-                except ValueError:
+                except (ValueError, aiohttp.ContentTypeError):
                     self.__logger.error("Error for %s text: %s", response.headers.get("x-request-id"), response.text)
                 return False
 
@@ -174,7 +174,7 @@ class ABLTApi:
                 try:
                     error_data = await response.json()
                     self.__logger.error("Error for %s details: %s", response.headers.get("x-request-id"), error_data)
-                except ValueError:
+                except (ValueError, aiohttp.ContentTypeError):
                     self.__logger.error(
                         "Error %s text: %s", response.headers.get("x-request-id"), await response.text()
                     )
@@ -301,7 +301,6 @@ class ABLTApi:
                     self.__logger.error("Error for %s: %s", response.headers.get("x-request-id"), response.status)
                     try:
                         error_data = await response.json()
-
                         self.__logger.error("Error details for %s:", response.headers.get("x-request-id"))
                         if isinstance(error_data["detail"], str):
                             self.__logger.error("  - %s", error_data["detail"])
@@ -313,7 +312,7 @@ class ABLTApi:
                                     )
                                 else:
                                     self.__logger.error("  - %s", error)
-                    except ValueError:
+                    except (ValueError, aiohttp.ContentTypeError):
                         error_text = await response.text()
                         self.__logger.error("Error for %s text: %s", response.headers.get("x-request-id"), error_text)
                     return
@@ -453,7 +452,7 @@ class ABLTApi:
                 try:
                     error_data = await response.json()
                     self.__logger.error("Error details for %s: %s", response.headers.get("x-request-id"), error_data)
-                except ValueError:
+                except (ValueError, aiohttp.ContentTypeError):
                     self.__logger.error(
                         "Error text for %s: %s", response.headers.get("x-request-id"), await response.text()
                     )
