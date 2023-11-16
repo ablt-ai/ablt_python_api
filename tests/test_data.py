@@ -12,6 +12,7 @@ This file contains data for tests.
 """
 import ssl
 from random import randint
+from sys import maxsize
 
 sslcontext = ssl.create_default_context()
 sslcontext.check_hostname = False
@@ -216,5 +217,5 @@ language_questions = [
         },
     },
 ]
-UPPER_USER_ID = 32768
-LOWER_USER_ID = -32767
+UPPER_USER_ID = -2147483648
+LOWER_USER_ID = 2147483647

@@ -222,3 +222,13 @@ async def test_async_chats_not_stream_max_words(api):
     )
     response = await get_full_response(async_generator)
     assert len(response.split()) <= (max_words + tolerance)
+
+
+@pytest.mark.asyncio
+async def test_async_chats_not_stream_use_search(api):
+    """
+    This method tests for async chat use web search
+
+    :param api: api fixture (returns ABLTApi instance)
+    """
+    return   # TBD
