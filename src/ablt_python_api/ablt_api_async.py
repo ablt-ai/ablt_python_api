@@ -161,7 +161,9 @@ class ABLTApi:
                         )
                     self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
                 except (ValueError, aiohttp.ContentTypeError):
-                    self.__logger.error("Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id"))
+                    self.__logger.error(
+                        "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
+                    )
                 return False
 
     async def get_bots(self) -> list[dict]:
@@ -176,10 +178,14 @@ class ABLTApi:
             async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
                 if response.status == 200:
                     return await response.json()
-                self.__logger.error("Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id"))
+                self.__logger.error(
+                    "Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id")
+                )
                 try:
                     error_data = await response.json()
-                    self.__logger.error("Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id"))
+                    self.__logger.error(
+                        "Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id")
+                    )
                 except (ValueError, aiohttp.ContentTypeError):
                     self.__logger.error(
                         "Error text: %s, x-request-id: %s", await response.text(), response.headers.get("x-request-id")
@@ -321,7 +327,9 @@ class ABLTApi:
                         self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
                     except (ValueError, aiohttp.ContentTypeError):
                         error_text = await response.text()
-                        self.__logger.error("Error text: %s, x-request-id: %s", error_text, response.headers.get("x-request-id"))
+                        self.__logger.error(
+                            "Error text: %s, x-request-id: %s", error_text, response.headers.get("x-request-id")
+                        )
                     return
 
     async def update_api(self) -> None:
