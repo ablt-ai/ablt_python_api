@@ -209,7 +209,7 @@ malformed_statistics = {
             "{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
         ),
     ],
-    "ids": ("bad start date", "bad end date", "bad start and end dates"),
+    "ids": ["bad start date", "bad end date", "bad start and end dates"],
 }
 wrong_chat_params = [
     {
@@ -217,7 +217,7 @@ wrong_chat_params = [
         "expected": [
             "Error: 422",
             "Error details:",
-            "  - value could not be parsed to a boolean " "(type: type_error.bool, location: ['body', 'use_search'])",
+            "  - value could not be parsed to a boolean (type: type_error.bool, location: ['body', 'use_search'])",
             "  - x-request-id: ",
         ],
         "id": "use_search",
@@ -238,7 +238,7 @@ wrong_chat_params = [
             "Error: 422",
             "Error details:",
             "  - str type expected (type: type_error.str, location: ['body', 'prompt'])",
-            '  - Either "prompt" or "messages" is required ' "(type: value_error, location: ['body', '__root__'])",
+            "  - Either \"prompt\" or \"messages\" is required (type: value_error, location: ['body', '__root__'])",
             "  - x-request-id: ",
         ],
         "id": "prompt",
@@ -249,7 +249,7 @@ wrong_chat_params = [
             "Error: 422",
             "Error details:",
             "  - value is not a valid list (type: type_error.list, location: ['body', 'messages'])",
-            '  - Either "prompt" or "messages" is required ' "(type: value_error, location: ['body', '__root__'])",
+            "  - Either \"prompt\" or \"messages\" is required (type: value_error, location: ['body', '__root__'])",
             "  - x-request-id: ",
         ],
         "id": "messages",
@@ -264,7 +264,7 @@ wrong_chat_params = [
             "  - none is not an allowed value (type: type_error.none.not_allowed, "
             "location: ['body', 'messages', 2])",
             "  - value is not a valid dict (type: type_error.dict, location: ['body', 'messages', 3])",
-            '  - Either "prompt" or "messages" is required ' "(type: value_error, location: ['body', '__root__'])",
+            "  - Either \"prompt\" or \"messages\" is required (type: value_error, location: ['body', '__root__'])",
             "  - x-request-id: ",
         ],
         "id": "messages (list)",
