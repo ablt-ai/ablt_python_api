@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 16.11.2023
+Last Modified: 17.11.2023
 
 Description:
 This file contains data for tests.
@@ -57,7 +57,6 @@ sample_questions = (
 )
 KEY_LENGTH = randint(8, 32)
 MIN_WORDS = 5
-SOME_USER_ID_RANGE = 65536
 DATE_TEST_PERIOD = 365
 
 ensured_bots = (
@@ -116,22 +115,6 @@ sample_messages = [
     },
     {
         "message": [
-            {"content": "I like to eat pizza", "role": "user"},
-            {"content": "Hello, I like pizza too!", "role": "assistant"},
-            {"content": "What do I like to eat?", "role": "user"},
-        ],
-        "expected_answer": "pizza",
-    },
-    {
-        "message": [
-            {"content": "I like to eat pizza", "role": "user"},
-            {"content": "Hello, I like pizza too!", "role": "assistant"},
-            {"content": "What do I like to eat?", "role": "user"},
-        ],
-        "expected_answer": "pizza",
-    },
-    {
-        "message": [
             {"content": "My hobby is hiking", "role": "user"},
             {"content": "Hello, I like traveling too!", "role": "assistant"},
             {"content": "What is my hobby?", "role": "user"},
@@ -140,32 +123,8 @@ sample_messages = [
     },
     {
         "message": [
-            {"content": "I like to eat pizza", "role": "user"},
-            {"content": "Hello, I like pizza too!", "role": "assistant"},
-            {"content": "What do I like to eat?", "role": "user"},
-        ],
-        "expected_answer": "pizza",
-    },
-    {
-        "message": [
-            {"content": "I like to eat pizza", "role": "user"},
-            {"content": "Hello, I like pizza too!", "role": "assistant"},
-            {"content": "What do I like to eat?", "role": "user"},
-        ],
-        "expected_answer": "pizza",
-    },
-    {
-        "message": [
-            {"content": "I like to eat pizza", "role": "user"},
-            {"content": "Hello, I like pizza too!", "role": "assistant"},
-            {"content": "What do I like to eat?", "role": "user"},
-        ],
-        "expected_answer": "pizza",
-    },
-    {
-        "message": [
             {"content": "My favourite book is 'The Sirens of Titan'", "role": "user"},
-            {"content": "Oh, seems you really lice science fiction!", "role": "assistant"},
+            {"content": "Oh, seems you really like science fiction!", "role": "assistant"},
             {"content": "Who is author of my favourite book? Tell me just and author.", "role": "user"},
         ],
         "expected_answer": "Vonnegut",

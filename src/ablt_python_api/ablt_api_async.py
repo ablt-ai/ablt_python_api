@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 06.11.2023
+Last Modified: 17.11.2023
 
 Description:
 This file contains an implementation of class for aBLT chat API.
@@ -477,17 +477,18 @@ class ABLTApi:
                     )
                 return None
 
-    async def get_statistics_for_a_day(self, user_id: int, date: str) -> Optional[dict]:
+    async def get_statistics_for_a_day(self, date: Optional[str] = None, user_id: Optional[int] = -1) -> Optional[dict]:
         """
         Retrieves usage statistics for the API: only statistics for a day.
 
-        :param user_id: The id of the user to get statistics for.
-        :type user_id: int
         :param date: day for which statistics are needed. It should be in format YYYY-MM-DD.
         :type date: str
+        :param user_id: The id of the user to get statistics for.
+        :type user_id: int
         :return: dict with statistics for a day.
         :rtype: dict | None.
         """
+        date = datetime.now().strftime("%Y-%m-%d") if date is None else date
         stats = await self.get_usage_statistics(user_id=user_id, start_date=date, end_date=date)
         if stats:
             items = stats.get("items")
@@ -497,7 +498,9 @@ class ABLTApi:
                         return usage_info
         return None
 
-    async def get_statistics_total(self, user_id: int, start_date: str, end_date: str) -> Optional[dict]:
+    async def get_statistics_total(
+        self, user_id: Optional[int] = -1, start_date: Optional[str] = None, end_date: Optional[str] = None
+    ) -> Optional[dict]:
         """
         Retrieves usage statistics for the API: only total statistics.
 
@@ -510,5 +513,7 @@ class ABLTApi:
         :return: dict (StatisticTotalSchema) with total statistics.
         :rtype: dict
         """
+        start_date = datetime.now().strftime("%Y-%m-%d") if start_date is None else start_date
+        end_date = datetime.now().strftime("%Y-%m-%d") if end_date is None else end_date
         stats = await self.get_usage_statistics(user_id=user_id, start_date=start_date, end_date=end_date)
         return stats.get("total") if stats is not None else None

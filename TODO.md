@@ -1,2 +1,2 @@
 - Add sync api
-- Add more tests
+- Add use_search tests
