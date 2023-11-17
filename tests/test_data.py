@@ -184,34 +184,32 @@ language_questions = [
         },
     },
 ]
-malformed_statistics: Dict[str, Union[List[Tuple], List[str]]] = {
-    "test_data": [
-        (
-            randint(LOWER_USER_ID, UPPER_USER_ID),
-            "bad_start_date",
-            datetime.now().strftime("%Y-%m-%d"),
-            "Error details: {'detail': ["
-            "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
-        ),
-        (
-            randint(LOWER_USER_ID, UPPER_USER_ID),
-            datetime.now().strftime("%Y-%m-%d"),
-            "bad_end_date",
-            "Error details: "
-            "{'detail': [{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
-        ),
-        (
-            randint(LOWER_USER_ID, UPPER_USER_ID),
-            "bad_start_date",
-            "bad_end_date",
-            "Error details: "
-            "{'detail': ["
-            "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}, "
-            "{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
-        ),
-    ],
-    "ids": ["bad start date", "bad end date", "bad start and end dates"]
-}
+malformed_statistics: List[Tuple] = [
+    (
+        randint(LOWER_USER_ID, UPPER_USER_ID),
+        "bad_start_date",
+        datetime.now().strftime("%Y-%m-%d"),
+        "Error details: {'detail': ["
+        "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
+    ),
+    (
+        randint(LOWER_USER_ID, UPPER_USER_ID),
+        datetime.now().strftime("%Y-%m-%d"),
+        "bad_end_date",
+        "Error details: "
+        "{'detail': [{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
+    ),
+    (
+        randint(LOWER_USER_ID, UPPER_USER_ID),
+        "bad_start_date",
+        "bad_end_date",
+        "Error details: "
+        "{'detail': ["
+        "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}, "
+        "{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
+    ),
+]
+malformed_statistics_ids = ("bad start date", "bad end date", "bad start and end dates")
 wrong_chat_params: List[Dict] = [
     {
         "use_search": choice((randint(LOWER_USER_ID, UPPER_USER_ID), token_hex(KEY_LENGTH))),

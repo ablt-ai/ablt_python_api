@@ -257,7 +257,6 @@ async def test_async_chats_not_stream_wrong_option(api, caplog, params):
 
 
 @pytest.mark.asyncio
-@pytest.mark.new
 async def test_async_chats_not_stream_use_search(api):
     """
     This method tests for async chat use web search

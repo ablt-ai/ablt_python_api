@@ -19,7 +19,7 @@ from secrets import token_hex
 import pytest
 
 from src.ablt_python_api.schemas import StatisticsSchema, StatisticItemSchema, StatisticTotalSchema
-from tests.test_data import LOWER_USER_ID, UPPER_USER_ID, DATE_TEST_PERIOD, KEY_LENGTH, malformed_statistics
+from tests.test_data import LOWER_USER_ID, UPPER_USER_ID, DATE_TEST_PERIOD, KEY_LENGTH, malformed_statistics, malformed_statistics_ids
 
 
 @pytest.mark.asyncio
@@ -102,11 +102,8 @@ async def test_async_statistics_specify_end_date_beforehand(api, random_date_gen
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "user_id,start_date,end_date,caplog_error",
-    malformed_statistics["test_data"],
-    ids=malformed_statistics["ids"],
-)
+@pytest.mark.new
+@pytest.mark.parametrize("user_id,start_date,end_date,caplog_error", malformed_statistics, ids=malformed_statistics_ids)
 async def test_async_statistics_with_malformed_payload(api, caplog, user_id, start_date, end_date, caplog_error):
     """
     This method tests for async statistics: get statistics for user_id
