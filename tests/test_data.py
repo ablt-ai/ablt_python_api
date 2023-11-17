@@ -184,7 +184,7 @@ language_questions = [
         },
     },
 ]
-malformed_statistics: Dict[str, Union[List[Tuple], Tuple[str, ...]]] = {
+malformed_statistics: Dict[str, Union[List[Tuple], List[str]]] = {
     "test_data": [
         (
             randint(LOWER_USER_ID, UPPER_USER_ID),
@@ -210,7 +210,7 @@ malformed_statistics: Dict[str, Union[List[Tuple], Tuple[str, ...]]] = {
             "{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
         ),
     ],
-    "ids": ("bad start date", "bad end date", "bad start and end dates")
+    "ids": ["bad start date", "bad end date", "bad start and end dates"]
 }
 wrong_chat_params: List[Dict] = [
     {
