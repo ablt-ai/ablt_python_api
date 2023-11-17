@@ -4,9 +4,9 @@
 
 # About
 
-This is Python ABLT API wrapper. It is used to communicate with ABLT API. You may use it to create your own ABLT client using asynchronous or synchronous Python. You can find more information about ABLT API [here](https://docs.ablt.ai/api_docs/overview).
+This is Python aBLT API wrapper. It is used to communicate with aBLT API. You may use it to create your own aBLT client using asynchronous or synchronous Python. You can find more information about aBLT API [here](https://docs.ablt.ai/api_docs/overview).
 
-At first, you need obtain ABLT API Token. You can do it [here](https://ablt.ai/) by get in touch and contact with support for paid plans. Next, you may use any existing ready-made bots or templates or create your own bot via UI interface.
+At first, you need obtain aBLT API Token. You can do it [here](https://ablt.ai/) by get in touch and contact with support for paid plans. Next, you may use any existing ready-made bots or templates or create your own bot via UI interface.
 
 # Installation
 

@@ -11,12 +11,25 @@ Description:
 This file contains data for tests.
 """
 import ssl
-from random import randint
+from datetime import datetime
+from random import randint, choice
+from secrets import token_hex
 
+# Certificates
 sslcontext = ssl.create_default_context()
 sslcontext.check_hostname = False
 sslcontext.verify_mode = ssl.CERT_NONE
 
+# Constants
+KEY_LENGTH = randint(8, 32)
+MIN_WORDS = 5
+SAFE_WORDS = 100
+DATE_TEST_PERIOD = 365
+LOWER_USER_ID = -2147483648
+UPPER_USER_ID = 2147483647
+LANGUAGES = ("Arabic", "French", "English", "Spanish", "Russian")
+
+# Test data
 unique_models = (
     "claude-2-aws-bedrock",
     "claude-aws-bedrock",
@@ -55,10 +68,6 @@ sample_questions = (
     "What is the most famous horror movie?",
     "Where can I find the best pizza in New York?",
 )
-KEY_LENGTH = randint(8, 32)
-MIN_WORDS = 5
-DATE_TEST_PERIOD = 365
-
 ensured_bots = (
     {
         "uid": "9c24d711-e599-421c-a5fa-d15e113f14f6",
@@ -130,7 +139,6 @@ sample_messages = [
         "expected_answer": "Vonnegut",
     },
 ]
-LANGUAGES = ("Arabic", "French", "English", "Spanish", "Russian")
 language_questions = [
     {
         "question": {
@@ -175,5 +183,90 @@ language_questions = [
         },
     },
 ]
-LOWER_USER_ID = -2147483648
-UPPER_USER_ID = 2147483647
+malformed_statistics = {
+    "test_data": [
+        (
+            randint(LOWER_USER_ID, UPPER_USER_ID),
+            "bad_start_date",
+            datetime.now().strftime("%Y-%m-%d"),
+            "Error details: {'detail': ["
+            "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
+        ),
+        (
+            randint(LOWER_USER_ID, UPPER_USER_ID),
+            datetime.now().strftime("%Y-%m-%d"),
+            "bad_end_date",
+            "Error details: "
+            "{'detail': [{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
+        ),
+        (
+            randint(LOWER_USER_ID, UPPER_USER_ID),
+            "bad_start_date",
+            "bad_end_date",
+            "Error details: "
+            "{'detail': ["
+            "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}, "
+            "{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
+        ),
+    ],
+    "ids": ("bad start date", "bad end date", "bad start and end dates"),
+}
+wrong_chat_params = [
+    {
+        "use_search": choice((randint(LOWER_USER_ID, UPPER_USER_ID), token_hex(KEY_LENGTH))),
+        "expected": [
+            "Error: 422",
+            "Error details:",
+            "  - value could not be parsed to a boolean " "(type: type_error.bool, location: ['body', 'use_search'])",
+            "  - x-request-id: ",
+        ],
+        "id": "use_search",
+    },
+    {
+        "bot_slug": choice((randint(LOWER_USER_ID, UPPER_USER_ID), token_hex(KEY_LENGTH))),
+        "expected": ["Error: 404", "Error details:", "  - Bot not found", "  - x-request-id: "],
+        "id": "bot_slug",
+    },
+    {
+        "bot_uid": choice((randint(LOWER_USER_ID, UPPER_USER_ID), token_hex(KEY_LENGTH))),
+        "expected": ["Error: 404", "Error details:", "  - Bot not found", "  - x-request-id: "],
+        "id": "bot_uid",
+    },
+    {
+        "prompt": choice(({"key": "value"}, [1, 2, 3])),
+        "expected": [
+            "Error: 422",
+            "Error details:",
+            "  - str type expected (type: type_error.str, location: ['body', 'prompt'])",
+            '  - Either "prompt" or "messages" is required ' "(type: value_error, location: ['body', '__root__'])",
+            "  - x-request-id: ",
+        ],
+        "id": "prompt",
+    },
+    {
+        "messages": choice((randint(LOWER_USER_ID, UPPER_USER_ID), {"key": "value"}, choice((True, False)), "string")),
+        "expected": [
+            "Error: 422",
+            "Error details:",
+            "  - value is not a valid list (type: type_error.list, location: ['body', 'messages'])",
+            '  - Either "prompt" or "messages" is required ' "(type: value_error, location: ['body', '__root__'])",
+            "  - x-request-id: ",
+        ],
+        "id": "messages",
+    },
+    {
+        "messages": [randint(LOWER_USER_ID, UPPER_USER_ID), token_hex(KEY_LENGTH), None, choice((True, False))],
+        "expected": [
+            "Error: 422",
+            "Error details:",
+            "  - value is not a valid dict (type: type_error.dict, location: ['body', 'messages', 0])",
+            "  - value is not a valid dict (type: type_error.dict, location: ['body', 'messages', 1])",
+            "  - none is not an allowed value (type: type_error.none.not_allowed, "
+            "location: ['body', 'messages', 2])",
+            "  - value is not a valid dict (type: type_error.dict, location: ['body', 'messages', 3])",
+            '  - Either "prompt" or "messages" is required ' "(type: value_error, location: ['body', '__root__'])",
+            "  - x-request-id: ",
+        ],
+        "id": "messages (list)",
+    },
+]

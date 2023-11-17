@@ -14,11 +14,12 @@ This file tests for async bots.
 from datetime import datetime, timedelta
 from logging import ERROR
 from random import randint
+from secrets import token_hex
 
 import pytest
 
 from src.ablt_python_api.schemas import StatisticsSchema, StatisticItemSchema, StatisticTotalSchema
-from tests.test_data import LOWER_USER_ID, UPPER_USER_ID, DATE_TEST_PERIOD
+from tests.test_data import LOWER_USER_ID, UPPER_USER_ID, DATE_TEST_PERIOD, KEY_LENGTH, malformed_statistics
 
 
 @pytest.mark.asyncio
@@ -103,32 +104,8 @@ async def test_async_statistics_specify_end_date_beforehand(api, random_date_gen
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     "user_id,start_date,end_date,caplog_error",
-    [
-        (
-            randint(LOWER_USER_ID, UPPER_USER_ID),
-            "bad_start_date",
-            datetime.now().strftime("%Y-%m-%d"),
-            "Error details: {'detail': ["
-            "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
-        ),
-        (
-            randint(LOWER_USER_ID, UPPER_USER_ID),
-            datetime.now().strftime("%Y-%m-%d"),
-            "bad_end_date",
-            "Error details: "
-            "{'detail': [{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
-        ),
-        (
-            randint(LOWER_USER_ID, UPPER_USER_ID),
-            "bad_start_date",
-            "bad_end_date",
-            "Error details: "
-            "{'detail': ["
-            "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}, "
-            "{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
-        ),
-    ],
-    ids=("bad start date", "bad end date", "bad start and end dates"),
+    malformed_statistics["test_data"],
+    ids=malformed_statistics["ids"],
 )
 async def test_async_statistics_with_malformed_payload(api, caplog, user_id, start_date, end_date, caplog_error):
     """
@@ -221,3 +198,39 @@ async def test_async_statistics_content(api):
         ],
     }
     assert response == expected
+
+
+@pytest.mark.asyncio
+async def test_async_statistics_wrong_user_id_usage(api, caplog):
+    """
+    This method tests for async statistics: wrong user_id for usage
+
+    :param api: api fixture
+    """
+    response = await api.get_usage_statistics(user_id=token_hex(KEY_LENGTH))
+    assert response is None
+    assert "Error: user_id should be int" in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_async_statistics_wrong_user_id_day(api, caplog):
+    """
+    This method tests for async statistics: wrong user_id for a day
+
+    :param api: api fixture
+    """
+    response = await api.get_statistics_for_a_day(user_id=token_hex(KEY_LENGTH))
+    assert response is None
+    assert "Error: user_id should be int" in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_async_statistics_wrong_user_id_total(api, caplog):
+    """
+    This method tests for async statistics: wrong user_id for total
+
+    :param api: api fixture
+    """
+    response = await api.get_statistics_total(user_id=token_hex(KEY_LENGTH))
+    assert response is None
+    assert "Error: user_id should be int" in caplog.text

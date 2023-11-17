@@ -198,7 +198,7 @@ class ABLTApi:
         bot_uid: Optional[str] = None,
         bot_slug: Optional[str] = None,
         prompt: Optional[str] = None,
-        messages=None,
+        messages: Optional[list] = None,
         stream: Optional[bool] = False,
         user_id: Optional[int] = None,
         language: Optional[str] = None,
@@ -246,7 +246,7 @@ class ABLTApi:
         Raises:
             DoneException: If the bot is done with the conversation.
         """
-        if (not prompt and not messages) or (prompt and messages):
+        if (prompt is None and messages is None) or (prompt is not None and messages is not None):
             self.__logger.error("Error: Only one param is required ('prompt' or 'messages')")
             return
 
@@ -257,7 +257,6 @@ class ABLTApi:
         url, headers = self.__get_url_and_headers("v1/chat")
         payload = {
             "stream": stream,
-            "use_search": use_search,
             **({"bot_slug": bot_slug} if bot_slug is not None else {}),
             **({"bot_uid": bot_uid} if bot_uid is not None else {}),
             **({"language": language} if language is not None else {}),
@@ -266,6 +265,7 @@ class ABLTApi:
             **({"prompt": prompt} if prompt is not None else {}),
             **({"messages": messages} if messages is not None else {}),
             **({"user_id": user_id} if user_id is not None else {}),
+            **({"use_search": use_search} if use_search is not None else {}),
         }
 
         async with aiohttp.ClientSession() as session:
@@ -439,7 +439,7 @@ class ABLTApi:
 
     async def get_usage_statistics(
         self,
-        user_id: int = -1,
+        user_id: Optional[int] = -1,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
     ) -> Optional[dict]:
@@ -455,6 +455,9 @@ class ABLTApi:
         :return: The response message from the bot (StatisticsSchema) or None in case of an error.
         :rtype: dict|None
         """
+        if not isinstance(user_id, int):
+            self.__logger.error("Error: user_id should be int")
+            return None
         start_date = datetime.now().strftime("%Y-%m-%d") if start_date is None else start_date
         end_date = datetime.now().strftime("%Y-%m-%d") if end_date is None else end_date
         url, headers = self.__get_url_and_headers("v1/user/usage-statistics")
@@ -488,6 +491,9 @@ class ABLTApi:
         :return: dict with statistics for a day.
         :rtype: dict | None.
         """
+        if not isinstance(user_id, int):
+            self.__logger.error("Error: user_id should be int")
+            return None
         date = datetime.now().strftime("%Y-%m-%d") if date is None else date
         stats = await self.get_usage_statistics(user_id=user_id, start_date=date, end_date=date)
         if stats:
@@ -513,6 +519,9 @@ class ABLTApi:
         :return: dict (StatisticTotalSchema) with total statistics.
         :rtype: dict
         """
+        if not isinstance(user_id, int):
+            self.__logger.error("Error: user_id should be int")
+            return None
         start_date = datetime.now().strftime("%Y-%m-%d") if start_date is None else start_date
         end_date = datetime.now().strftime("%Y-%m-%d") if end_date is None else end_date
         stats = await self.get_usage_statistics(user_id=user_id, start_date=start_date, end_date=end_date)
