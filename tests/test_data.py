@@ -14,6 +14,7 @@ import ssl
 from datetime import datetime
 from random import randint, choice
 from secrets import token_hex
+from typing import List, Dict, Tuple, Union
 
 # Certificates
 sslcontext = ssl.create_default_context()
@@ -183,8 +184,8 @@ language_questions = [
         },
     },
 ]
-malformed_statistics = {
-    "test_data": (
+malformed_statistics: Dict[str, Union[List[Tuple], Tuple[str, ...]]] = {
+    "test_data": [
         (
             randint(LOWER_USER_ID, UPPER_USER_ID),
             "bad_start_date",
@@ -208,10 +209,10 @@ malformed_statistics = {
             "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}, "
             "{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
         ),
-    ),
-    "ids": ("bad start date", "bad end date", "bad start and end dates"),
+    ],
+    "ids": ("bad start date", "bad end date", "bad start and end dates")
 }
-wrong_chat_params = [
+wrong_chat_params: List[Dict] = [
     {
         "use_search": choice((randint(LOWER_USER_ID, UPPER_USER_ID), token_hex(KEY_LENGTH))),
         "expected": [

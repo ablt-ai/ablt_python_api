@@ -229,7 +229,7 @@ async def test_async_chats_not_stream_max_words(api):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("params", wrong_chat_params, ids=[item['id'] for item in wrong_chat_params])  # mypy: ignore
+@pytest.mark.parametrize("params", wrong_chat_params, ids=[item['id'] for item in wrong_chat_params])
 async def test_async_chats_not_stream_wrong_option(api, caplog, params):
     """
     This method tests for async chat wrong options
