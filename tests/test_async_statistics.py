@@ -19,7 +19,14 @@ from secrets import token_hex
 import pytest
 
 from src.ablt_python_api.schemas import StatisticsSchema, StatisticItemSchema, StatisticTotalSchema
-from tests.test_data import LOWER_USER_ID, UPPER_USER_ID, DATE_TEST_PERIOD, KEY_LENGTH, malformed_statistics, malformed_statistics_ids
+from tests.test_data import (
+    LOWER_USER_ID,
+    UPPER_USER_ID,
+    DATE_TEST_PERIOD,
+    KEY_LENGTH,
+    malformed_statistics,
+    malformed_statistics_ids,
+)
 
 
 @pytest.mark.asyncio

@@ -14,7 +14,7 @@ import ssl
 from datetime import datetime
 from random import randint, choice
 from secrets import token_hex
-from typing import List, Dict, Tuple, Union
+from typing import List, Dict, Tuple
 
 # Certificates
 sslcontext = ssl.create_default_context()
