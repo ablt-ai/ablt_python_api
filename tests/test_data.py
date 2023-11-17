@@ -184,7 +184,7 @@ language_questions = [
     },
 ]
 malformed_statistics = {
-    "test_data": [
+    "test_data": (
         (
             randint(LOWER_USER_ID, UPPER_USER_ID),
             "bad_start_date",
@@ -208,8 +208,8 @@ malformed_statistics = {
             "{'loc': ['body', 'start_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}, "
             "{'loc': ['body', 'end_date'], 'msg': 'invalid date format', 'type': 'value_error.date'}]}",
         ),
-    ],
-    "ids": ["bad start date", "bad end date", "bad start and end dates"],
+    ),
+    "ids": ("bad start date", "bad end date", "bad start and end dates"),
 }
 wrong_chat_params = [
     {
