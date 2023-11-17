@@ -11,7 +11,6 @@ Description:
 This file tests for async chats (non-streaming mode).
 """
 # pylint: disable=R0801
-from datetime import datetime
 from logging import ERROR
 from random import choice, randint
 
@@ -26,7 +25,6 @@ from tests.test_data import (
     LANGUAGES,
     LOWER_USER_ID,
     MIN_WORDS,
-    SAFE_WORDS,
     UPPER_USER_ID,
 )
 
