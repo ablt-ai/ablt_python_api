@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 15.11.2023
-Last Modified: 16.11.2023
+Last Modified: 17.11.2023
 
 Description:
 This file tests for async chats (streaming mode).
@@ -22,6 +22,7 @@ from tests.test_data import (
     sample_questions,
     sample_messages,
     language_questions,
+    wrong_chat_params,
     LANGUAGES,
     LOWER_USER_ID,
     MIN_WORDS,
@@ -213,6 +214,34 @@ async def test_async_chats_stream_max_words(api):
     async_generator = api.chat(bot_uid=bot.uid, prompt=choice(sample_questions), max_words=max_words, stream=True)
     response = await get_full_response(async_generator)
     assert len(response.split()) <= (max_words + tolerance)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("params", wrong_chat_params, ids=[item["id"] for item in wrong_chat_params])
+async def test_async_chats_not_stream_wrong_option(api, caplog, params):
+    """
+    This method tests for async chat wrong options
+
+    :param api: api fixture (returns ABLTApi instance)
+    :param caplog: caplog pytest fixture
+    :param params: params for test
+    """
+    bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
+    bot_uid = bot.uid if "bot_slug" not in params.keys() else None
+    prompt = choice(sample_questions) if "prompt" not in params.keys() else params["prompt"]
+    prompt = prompt if "messages" not in params.keys() else None
+    async_generator = api.chat(
+        bot_uid=bot_uid if "bot_uid" not in params.keys() else params["bot_uid"],
+        bot_slug=None if "bot_slug" not in params.keys() else params["bot_slug"],
+        prompt=None if "messages" in params.keys() else prompt,
+        messages=params["messages"] if "messages" in params.keys() else None,
+        use_search=params["use_search"] if "use_search" in params.keys() else False,
+        max_words=MIN_WORDS,
+        stream=False,
+    )
+    response = await get_full_response(async_generator)
+    assert response is None, f"Response is {response}"
+    assert all(message in caplog.text for message in params["expected"]), "Not all messages were found in caplog"
 
 
 @pytest.mark.asyncio
