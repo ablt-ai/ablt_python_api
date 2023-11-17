@@ -237,6 +237,8 @@ async def test_async_chats_not_stream_wrong_option(api, caplog, params):
     This method tests for async chat wrong options
 
     :param api: api fixture (returns ABLTApi instance)
+    :param caplog: caplog pytest fixture
+    :param params: test parameters
     """
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
     bot_uid = bot.uid if "bot_slug" not in params.keys() else None
