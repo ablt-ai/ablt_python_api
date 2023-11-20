@@ -32,7 +32,7 @@ api = ABLTApi(bearer_token=YOUR_ABLT_API_TOKEN)
 api = ABLTApi()
 ```
 
-For some reason you may want to use your own logger, then you can initilize API wrapper with logger:
+For some reason you may want to use your own logger, then you can initialize API wrapper with logger:
 
 ```python
 # logger it's pre-configured instance of logging.logger
