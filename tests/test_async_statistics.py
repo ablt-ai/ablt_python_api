@@ -109,7 +109,6 @@ async def test_async_statistics_specify_end_date_beforehand(api, random_date_gen
 
 
 @pytest.mark.asyncio
-@pytest.mark.new
 @pytest.mark.parametrize("user_id,start_date,end_date,caplog_error", malformed_statistics, ids=malformed_statistics_ids)
 async def test_async_statistics_with_malformed_payload(api, caplog, user_id, start_date, end_date, caplog_error):
     """
