@@ -101,6 +101,7 @@ ensured_bots = (
 sample_messages = [
     {
         "message": [
+            {"content": "Answer always just an answer, term, what I've asked, nothing more.", "role": "system"},
             {"content": "My name is Iliya", "role": "user"},
             {"content": "Hello, Iliya", "role": "assistant"},
             {"content": "Tell me my name, please", "role": "user"},
@@ -109,6 +110,7 @@ sample_messages = [
     },
     {
         "message": [
+            {"content": "Answer always just an answer, term, what I've asked, nothing more.", "role": "system"},
             {"content": "I live in Novi Sad, Serbia", "role": "user"},
             {"content": "Hello, that's nice city!", "role": "assistant"},
             {"content": "Do you know where I live?", "role": "user"},
@@ -117,6 +119,7 @@ sample_messages = [
     },
     {
         "message": [
+            {"content": "Answer always just an answer, term, what I've asked, nothing more.", "role": "system"},
             {"content": "I like to eat pizza", "role": "user"},
             {"content": "Hello, I like pizza too!", "role": "assistant"},
             {"content": "What do I like to eat?", "role": "user"},
@@ -125,6 +128,7 @@ sample_messages = [
     },
     {
         "message": [
+            {"content": "Answer always just an answer, term, what I've asked, nothing more.", "role": "system"},
             {"content": "My hobby is hiking", "role": "user"},
             {"content": "Hello, I like traveling too!", "role": "assistant"},
             {"content": "What is my hobby?", "role": "user"},
@@ -133,6 +137,7 @@ sample_messages = [
     },
     {
         "message": [
+            {"content": "Answer always just an answer, term, what I've asked, nothing more.", "role": "system"},
             {"content": "My favourite book is 'The Sirens of Titan'", "role": "user"},
             {"content": "Oh, seems you really like science fiction!", "role": "assistant"},
             {"content": "Who is author of my favourite book? Tell me just and author.", "role": "user"},

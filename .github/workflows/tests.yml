@@ -32,4 +32,4 @@ jobs:
       id: tests
       env:
         ABLT_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
-      run: PYTHONPATH=. pytest tests -vv -rfEx --tb=short -p no:warnings
+      run: PYTHONPATH=. pytest tests

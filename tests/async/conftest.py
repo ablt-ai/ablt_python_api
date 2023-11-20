@@ -5,10 +5,10 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 03.11.2023
+Last Modified: 20.11.2023
 
 Description:
-This file contains pytest fixtures.
+This file contains pytest fixtures for async API.
 """
 
 import random
@@ -19,7 +19,7 @@ from typing import Optional
 import pytest
 
 from src.ablt_python_api.ablt_api_async import ABLTApi
-from .test_data import sslcontext
+from tests.test_data import sslcontext
 
 
 @pytest.fixture(scope="session")

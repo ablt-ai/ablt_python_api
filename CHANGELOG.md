@@ -10,3 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - aBLT async API
 - added few tests to cover the async API
+
+## [0.0.2] - 2023-11-20
+
+### Added
+- aBLT sync API
+- added few tests to cover the sync API

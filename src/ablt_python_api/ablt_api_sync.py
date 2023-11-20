@@ -1,26 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-Filename: ablt_api_async.py
+Filename: ablt_api_sync.py
 Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
-Created: 03.11.2023
-Last Modified: 17.11.2023
+Created: 20.11.2023
+Last Modified: 20.11.2023
 
 Description:
-This file contains an implementation of class for async aBLT chat API.
+This file contains an implementation of class for sync aBLT chat API.
 """
 
-import asyncio
 import json
 import logging
-import ssl
 from datetime import datetime
 from os import environ
 from time import sleep
 from typing import Optional
 
-import aiohttp
+import requests
 
 from .utils.exceptions import DoneException
 from .utils.logger_config import setup_logger
@@ -34,7 +32,7 @@ class ABLTApi:
         bearer_token: Optional[str] = None,
         base_api_url: str = "https://api.ablt.ai",
         logger: Optional[logging.Logger] = None,
-        ssl_context: Optional[ssl.SSLContext] = None,
+        ssl_verify: Optional[bool] = True,
     ):
         """
         Initializes the object with the provided base API URL and bearer token.
@@ -45,8 +43,8 @@ class ABLTApi:
         :type base_api_url: str
         :param logger: default logger.
         :type logger: logger
-        :param ssl_context: ssl context for aiohttp.
-        :type ssl_context: ssl.SSLContext
+        :param ssl_verify: ssl verification enabled or not.
+        :type ssl_verify: bool
 
         Raises:
             TypeError: If the bearer token is not provided.
@@ -59,23 +57,13 @@ class ABLTApi:
                 raise TypeError("Bearer token is required!")
         else:
             self.__bearer_token = bearer_token
-        self.__ssl_context = ssl_context
+        self.__ssl_verify = ssl_verify
         if logger:
             self.__logger = logger
         else:
             self.__logger = setup_logger("api", "api.log")
             self.__logger.info("Logger for API now launched!")
-
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        if loop.is_running():
-            loop.create_task(self.update_api())
-        else:
-            loop.run_until_complete(self.update_api())
+        self.update_api()
 
     def get_base_api_url(self) -> str:
         """
@@ -118,7 +106,7 @@ class ABLTApi:
         headers = {"Authorization": f"Bearer {self.__bearer_token}"}
         return url, headers
 
-    async def health_check(self) -> bool:
+    def health_check(self) -> bool:
         """
         Performs a health check on the API.
 
@@ -126,47 +114,45 @@ class ABLTApi:
         :rtype: bool
         """
         url, headers = self.__get_url_and_headers("health-check")
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    if data.get("status") == "ok":
-                        self.__logger.info("ABLT chat API is working like a charm")
-                        return True
-                    self.__logger.error("Error: %s", data.get("status"))
-                    try:
-                        self.__logger.error("Error details:")
-                        for error in data["detail"]:
-                            self.__logger.error(
-                                "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
-                            )
-                        self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
-                    except ValueError:
-                        self.__logger.error(
-                            "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
-                        )
-                    return False
+        response = None
+        try:
+            session = requests.session()
+            session.verify = self.__ssl_verify
+            response = session.get(url, headers=headers, verify=self.__ssl_verify)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            if response:
                 self.__logger.error(
-                    "Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id")
+                    "Request error: HTTP error: %s, x-request-id: %s", err, response.headers.get("x-request-id")
                 )
-                try:
-                    error_data = await response.json()
-                    self.__logger.error("Error details:")
-                    for original_error in error_data["detail"]:
-                        self.__logger.error(
-                            "  - %s (type: %s, location: %s)",
-                            original_error["msg"],
-                            original_error["type"],
-                            original_error["loc"],
-                        )
-                    self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
-                except (ValueError, aiohttp.ContentTypeError):
-                    self.__logger.error(
-                        "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
-                    )
-                return False
+            return False
+        except requests.exceptions.ConnectionError as err:
+            if response:
+                self.__logger.error(
+                    "Request error: Connection error: %s, x-request-id: %s", err, response.headers.get("x-request-id")
+                )
+            return False
+        except requests.exceptions.MissingSchema as err:
+            if response:
+                self.__logger.error(
+                    "Request error: Invalid URL: %s, x-request-id: %s", err, response.headers.get("x-request-id")
+                )
+            return False
+        data = response.json()
+        if data.get("status") == "ok":
+            self.__logger.info("ABLT chat API is working like a charm")
+            return True
+        self.__logger.error("Error: %s", data.get("status"))
+        try:
+            self.__logger.error("Error details:")
+            for error in data["detail"]:
+                self.__logger.error("  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"])
+            self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
+        except ValueError:
+            self.__logger.error("Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id"))
+        return False
 
-    async def get_bots(self) -> list[dict]:
+    def get_bots(self) -> list[dict]:
         """
         Retrieves all published bots.
 
@@ -174,26 +160,20 @@ class ABLTApi:
         :rtype: list[dict]
         """
         url, headers = self.__get_url_and_headers("v1/bots")
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
-                if response.status == 200:
-                    return await response.json()
-                self.__logger.error(
-                    "Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id")
-                )
-                try:
-                    error_data = await response.json()
-                    self.__logger.error(
-                        "Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id")
-                    )
-                except (ValueError, aiohttp.ContentTypeError):
-                    self.__logger.error(
-                        "Error text: %s, x-request-id: %s", await response.text(), response.headers.get("x-request-id")
-                    )
-                return []
+        try:
+            session = requests.session()
+            session.verify = self.__ssl_verify
+            response = session.get(url, headers=headers, verify=self.__ssl_verify)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            self.__logger.error(
+                "Request error: HTTP error occurred: %s, x-request-id: %s", err, response.headers.get("x-request-id")
+            )
+            return []
+        return response.json()
 
-    # pylint: disable=R0914,R0912,R0915
-    async def chat(
+    # pylint: disable=R0914,R0912,R0915,R1702
+    def chat(
         self,
         bot_uid: Optional[str] = None,
         bot_slug: Optional[str] = None,
@@ -268,71 +248,69 @@ class ABLTApi:
             **({"use_search": use_search} if use_search is not None else {}),
         }
 
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, json=payload, ssl=self.__ssl_context) as response:
-                if response.status == 200:
-                    if stream:
-                        try:
-                            async for line in response.content.iter_any():
-                                if line:
-                                    line_data = line.decode("utf-8").splitlines()
-                                    for data in line_data:
-                                        if data.startswith("data:"):
-                                            if "[DONE]" in data:
-                                                raise DoneException
-                                            data = data[5:].strip()
-                                            try:
-                                                message_data = json.loads(data)
-                                            except json.JSONDecodeError:
-                                                self.__logger.error("Seems json malformed %s", line)
-                                                continue
-                                            content = message_data.get("content")
-                                            message = message_data.get("message")
-                                            if content is not None:
-                                                yield content
-                                            elif message is not None:
-                                                yield message
-                        finally:
-                            await response.release()
-                    else:
-                        response_json = await response.json()
+        session = requests.session()
+        session.verify = self.__ssl_verify
+        response = session.post(url, headers=headers, json=payload, verify=self.__ssl_verify)
+        if response.status_code == 200:
+            if stream:
+                for line in response.iter_lines():
+                    if line:
+                        line_data = line.decode("utf-8").splitlines()
+                        for data in line_data:
+                            if data.startswith("data:"):
+                                if "[DONE]" in data:
+                                    raise DoneException
+                                data = data[5:].strip()
+                                try:
+                                    message_data = json.loads(data)
+                                except json.JSONDecodeError:
+                                    self.__logger.error("Seems json malformed %s", line)
+                                    continue
+                                content = message_data.get("content")
+                                message = message_data.get("message")
+                                if content is not None:
+                                    yield content
+                                elif message is not None:
+                                    yield message
+            else:
+                response_json = response.json()
 
-                        if "message" in response_json:
-                            message = response_json.get("message")
-                        elif "content" in response_json:
-                            message = response_json.get("content")
-                        else:
-                            self.__logger.error(
-                                "Response malformed! Actual response is: %s, x-request-id: %s",
-                                response_json,
-                                response.headers.get("x-request-id"),
-                            )
-                            return
-                        yield message
+                if "message" in response_json:
+                    message = response_json.get("message")
+                elif "content" in response_json:
+                    message = response_json.get("content")
                 else:
-                    self.__logger.error("Error: %s", response.status)
-                    try:
-                        error_data = await response.json()
-                        self.__logger.error("Error details:")
-                        if isinstance(error_data["detail"], str):
-                            self.__logger.error("  - %s", error_data["detail"])
-                        else:
-                            for error in error_data["detail"]:
-                                if error.get("msg") and error.get("type") and error.get("loc"):
-                                    self.__logger.error(
-                                        "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
-                                    )
-                                else:
-                                    self.__logger.error("  - %s", error)
-                        self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
-                    except (ValueError, aiohttp.ContentTypeError):
-                        error_text = await response.text()
-                        self.__logger.error(
-                            "Error text: %s, x-request-id: %s", error_text, response.headers.get("x-request-id")
-                        )
+                    self.__logger.error(
+                        "Response malformed! Actual response is: %s, x-request-id: %s",
+                        response_json,
+                        response.headers.get("x-request-id"),
+                    )
                     return
+                yield message
+        else:
+            self.__logger.error("Error: %s", response.status_code)
+            try:
+                error_data = response.json()
+                self.__logger.error("Error details:")
+                if isinstance(error_data["detail"], str):
+                    self.__logger.error("  - %s", error_data["detail"])
+                else:
+                    for error in error_data["detail"]:
+                        if error.get("msg") and error.get("type") and error.get("loc"):
+                            self.__logger.error(
+                                "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
+                            )
+                        else:
+                            self.__logger.error("  - %s", error)
+                self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
+            except (ValueError, json.JSONDecodeError):
+                error_text = response.text
+                self.__logger.error(
+                    "Error text: %s, x-request-id: %s", error_text, response.headers.get("x-request-id")
+                )
+            return
 
-    async def update_api(self) -> None:
+    def update_api(self) -> None:
         """
         Updates the API by calling the health_check function.
 
@@ -343,7 +321,7 @@ class ABLTApi:
         """
         retries = 0
         while retries < 10:
-            if not await self.health_check():
+            if not self.health_check():
                 retries += 1
                 self.__logger.warning("WARNING: Seems something nasty happened with aBLT api, trying %s/10", retries)
                 sleep(5)
@@ -352,7 +330,7 @@ class ABLTApi:
         if retries >= 10:
             raise ConnectionError("ERROR: Connection to aBLT API couldn't be established")
 
-    async def set_base_api_url(self, new_base_api_url: str, instant_update: bool = False):
+    def set_base_api_url(self, new_base_api_url: str, instant_update: bool = False):
         """
         Sets a new base API URL.
 
@@ -363,9 +341,9 @@ class ABLTApi:
         """
         self.__base_api_url = new_base_api_url
         if instant_update:
-            await self.update_api()
+            self.update_api()
 
-    async def set_bearer_token(self, new_bearer_token: str, instant_update: bool = False):
+    def set_bearer_token(self, new_bearer_token: str, instant_update: bool = False):
         """
         Sets a new bearer token.
 
@@ -376,9 +354,9 @@ class ABLTApi:
         """
         self.__bearer_token = new_bearer_token
         if instant_update:
-            await self.update_api()
+            self.update_api()
 
-    async def update_api_info(self, new_bearer_token: Optional[str] = None, new_base_api_url: Optional[str] = None):
+    def update_api_info(self, new_bearer_token: Optional[str] = None, new_base_api_url: Optional[str] = None):
         """
         Updates the API information with new bearer token and/or new base API URL.
 
@@ -390,12 +368,12 @@ class ABLTApi:
         - new_base_api_url (str): The new base API URL as a string, if any. Default is None.
         """
         if new_bearer_token:
-            await self.set_bearer_token(new_bearer_token)
+            self.set_bearer_token(new_bearer_token)
         if new_base_api_url:
-            await self.set_base_api_url(new_base_api_url)
-        await self.update_api()
+            self.set_base_api_url(new_base_api_url)
+        self.update_api()
 
-    async def find_bot_by_uid(self, bot_uid: str) -> Optional[dict]:
+    def find_bot_by_uid(self, bot_uid: str) -> Optional[dict]:
         """
         Searches for a bot by its id in the bot list.
 
@@ -404,12 +382,12 @@ class ABLTApi:
         :return: bot dict (BotSchema).
         :rtype: dict|None
         """
-        for bot_info in await self.get_bots():
+        for bot_info in self.get_bots():
             if bot_info.get("uid") == bot_uid:
                 return bot_info
         return None
 
-    async def find_bot_by_slug(self, bot_slug: str) -> Optional[dict]:
+    def find_bot_by_slug(self, bot_slug: str) -> Optional[dict]:
         """
         Searches for a bot by its slug in the bot list.
 
@@ -418,12 +396,12 @@ class ABLTApi:
         :return: bot dict (BotSchema).
         :rtype: dict|None
         """
-        for bot_info in await self.get_bots():
+        for bot_info in self.get_bots():
             if bot_info.get("slug") == bot_slug:
                 return bot_info
         return None
 
-    async def find_bot_by_name(self, bot_name: str) -> Optional[dict]:
+    def find_bot_by_name(self, bot_name: str) -> Optional[dict]:
         """
         Searches for a bot by its name in the bot list.
 
@@ -432,12 +410,12 @@ class ABLTApi:
         :return: bot dict (BotSchema).
         :rtype: dict|None
         """
-        for bot_info in await self.get_bots():
+        for bot_info in self.get_bots():
             if bot_info.get("name") == bot_name:
                 return bot_info
         return None
 
-    async def get_usage_statistics(
+    def get_usage_statistics(
         self,
         user_id: Optional[int] = -1,
         start_date: Optional[str] = None,
@@ -462,25 +440,23 @@ class ABLTApi:
         end_date = datetime.now().strftime("%Y-%m-%d") if end_date is None else end_date
         url, headers = self.__get_url_and_headers("v1/user/usage-statistics")
         payload = {"user_id": user_id, "start_date": start_date, "end_date": end_date}
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, json=payload, headers=headers, ssl=self.__ssl_context) as response:
-                if response.status == 200:
-                    return await response.json()
-                self.__logger.error(
-                    "Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id")
-                )
-                try:
-                    error_data = await response.json()
-                    self.__logger.error(
-                        "Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id")
-                    )
-                except (ValueError, aiohttp.ContentTypeError):
-                    self.__logger.error(
-                        "Error text: %s, x-request-id: %s", await response.text(), response.headers.get("x-request-id")
-                    )
-                return None
 
-    async def get_statistics_for_a_day(self, date: Optional[str] = None, user_id: Optional[int] = -1) -> Optional[dict]:
+        session = requests.session()
+        session.verify = self.__ssl_verify
+        response = session.post(url, json=payload, headers=headers, verify=self.__ssl_verify)
+        if response.status_code == 200:
+            return response.json()
+        self.__logger.error(
+            "Request error: %s, x-request-id: %s", response.status_code, response.headers.get("x-request-id")
+        )
+        try:
+            error_data = response.json()
+            self.__logger.error("Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id"))
+        except ValueError:
+            self.__logger.error("Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id"))
+        return None
+
+    def get_statistics_for_a_day(self, date: Optional[str] = None, user_id: Optional[int] = -1) -> Optional[dict]:
         """
         Retrieves usage statistics for the API: only statistics for a day.
 
@@ -495,7 +471,7 @@ class ABLTApi:
             self.__logger.error("Error: user_id should be int")
             return None
         date = datetime.now().strftime("%Y-%m-%d") if date is None else date
-        stats = await self.get_usage_statistics(user_id=user_id, start_date=date, end_date=date)
+        stats = self.get_usage_statistics(user_id=user_id, start_date=date, end_date=date)
         if stats:
             items = stats.get("items")
             if items is not None:
@@ -504,7 +480,7 @@ class ABLTApi:
                         return usage_info
         return None
 
-    async def get_statistics_total(
+    def get_statistics_total(
         self, user_id: Optional[int] = -1, start_date: Optional[str] = None, end_date: Optional[str] = None
     ) -> Optional[dict]:
         """
@@ -524,5 +500,5 @@ class ABLTApi:
             return None
         start_date = datetime.now().strftime("%Y-%m-%d") if start_date is None else start_date
         end_date = datetime.now().strftime("%Y-%m-%d") if end_date is None else end_date
-        stats = await self.get_usage_statistics(user_id=user_id, start_date=start_date, end_date=end_date)
+        stats = self.get_usage_statistics(user_id=user_id, start_date=start_date, end_date=end_date)
         return stats.get("total") if stats is not None else None
