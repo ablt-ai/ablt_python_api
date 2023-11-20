@@ -156,7 +156,7 @@ def test_sync_chats_stream_use_messages(api):
     if response is not None:
         assert messages["expected_answer"] in response
     else:
-        assert False
+        raise AssertionError("Response is None")
 
 
 @pytest.mark.sync
