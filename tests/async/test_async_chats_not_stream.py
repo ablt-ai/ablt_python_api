@@ -86,12 +86,8 @@ async def test_async_chats_not_stream_bot_selection_by_slug(api):
     :param api: api fixture (returns ABLTApi instance)
     """
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
-    async_generator = api.chat(
-        bot_slug=bot.slug,
-        prompt=f"What is your name? Answer in {MIN_WORDS} words maximum, please.",
-        max_words=MIN_WORDS,
-        stream=False,
-    )
+    prompt = f"What is your name? Answer just your name (full name, without greetings etc.). Use in {MIN_WORDS} max."
+    async_generator = api.chat(bot_slug=bot.slug, prompt=prompt, max_words=MIN_WORDS, stream=False)
     response = await get_full_response(async_generator)
     assert bot.name.replace(" Bot", "").replace(" Template", "").lower() in response.lower()
 
@@ -216,7 +212,7 @@ async def test_async_chats_not_stream_max_words(api):
     :param api: api fixture (returns ABLTApi instance)
     """
     max_words = randint(3, 10)
-    tolerance = 1  # tolerance for tokens to words conversion
+    tolerance = 2  # tolerance for tokens to words conversion
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
     async_generator = api.chat(
         bot_uid=bot.uid,

@@ -1,6 +1,6 @@
 # aBLT Python API wrapper
 
-[![Linters](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_linters.yml/badge.svg?branch=master)](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_linters.yml) [![Tests](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_tests.yml/badge.svg?branch=master)](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_tests.yml)
+[![PyPI version](https://badge.fury.io/py/ablt-python-api.svg)](https://badge.fury.io/py/ablt-python-api) [![Linters](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_linters.yml/badge.svg?branch=master)](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_linters.yml) [![Tests](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_tests.yml/badge.svg?branch=master)](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_tests.yml)
 
 # About
 
@@ -13,7 +13,7 @@ At first, you need obtain aBLT API Token. You can do it [here](https://ablt.ai/)
 API wrapper is available on PyPI. You can install it with pip (recommended to use Python 3.9+):
 
 ```bash
-pip install ablt_python_api
+pip install ablt-python-api
 ```
 
 # Usage
@@ -32,7 +32,7 @@ api = ABLTApi(bearer_token=YOUR_ABLT_API_TOKEN)
 api = ABLTApi()
 ```
 
-For some reason you may want to use your own logger, then you can initilize API wrapper with logger:
+For some reason you may want to use your own logger, then you can initialize API wrapper with logger:
 
 ```python
 # logger it's pre-configured instance of logging.logger

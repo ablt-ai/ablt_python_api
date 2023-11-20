@@ -5,14 +5,13 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 15.11.2023
+Last Modified: 20.11.2023
 
 Description:
 This file tests for async constructor.
 """
 from logging import INFO
 from os import environ
-from random import choice
 from secrets import token_hex
 
 import pytest
@@ -74,10 +73,21 @@ def test_async_constructor_default_init_with_any_token_and_valid_url(caplog):
 @pytest.mark.asyncio
 def test_async_constructor_default_init_with_invalid_url():
     """Test against constructor with invalid url."""
+    with pytest.raises(ConnectionError):
+        ABLTApi(
+            bearer_token=token_hex(KEY_LENGTH),
+            base_api_url=f"https://{token_hex(KEY_LENGTH)}",
+            ssl_context=sslcontext,
+        )
+
+
+@pytest.mark.asyncio
+def test_async_constructor_default_init_with_empty_url():
+    """Test against constructor with invalid url."""
     with pytest.raises(client_exceptions.InvalidURL):
         ABLTApi(
             bearer_token=token_hex(KEY_LENGTH),
-            base_api_url=choice(("", f"https://{token_hex(KEY_LENGTH)}")),
+            base_api_url="",
             ssl_context=sslcontext,
         )
 

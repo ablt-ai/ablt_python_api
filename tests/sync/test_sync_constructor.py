@@ -12,7 +12,6 @@ This file tests for sync constructor.
 """
 from logging import INFO
 from os import environ
-from random import choice
 from secrets import token_hex
 
 import pytest
@@ -76,12 +75,25 @@ def test_sync_constructor_default_init_with_invalid_url():
     with pytest.raises(ConnectionError):
         ABLTApi(
             bearer_token=token_hex(KEY_LENGTH),
-            base_api_url=choice(("", f"https://{token_hex(KEY_LENGTH)}")),
+            base_api_url=f"https://{token_hex(KEY_LENGTH)}",
             ssl_verify=False,
         )
 
 
 @pytest.mark.sync
+@pytest.mark.new
+def test_sync_constructor_default_init_with_empty_url():
+    """Test against constructor with invalid url."""
+    with pytest.raises(ConnectionError):
+        ABLTApi(
+            bearer_token=token_hex(KEY_LENGTH),
+            base_api_url="",
+            ssl_verify=False,
+        )
+
+
+@pytest.mark.sync
+@pytest.mark.new
 def test_sync_constructor_default_init_with_incorrect_logger():
     """Test against constructor with incorrect logger."""
     with pytest.raises(AttributeError):

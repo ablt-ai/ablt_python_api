@@ -127,43 +127,47 @@ class ABLTApi:
         """
         url, headers = self.__get_url_and_headers("health-check")
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    if data.get("status") == "ok":
-                        self.__logger.info("ABLT chat API is working like a charm")
-                        return True
-                    self.__logger.error("Error: %s", data.get("status"))
-                    try:
-                        self.__logger.error("Error details:")
-                        for error in data["detail"]:
+            try:
+                async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if data.get("status") == "ok":
+                            self.__logger.info("ABLT chat API is working like a charm")
+                            return True
+                        self.__logger.error("Error: %s", data.get("status"))
+                        try:
+                            self.__logger.error("Error details:")
+                            for error in data["detail"]:
+                                self.__logger.error(
+                                    "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
+                                )
+                            self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
+                        except ValueError:
                             self.__logger.error(
-                                "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
+                                "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
+                            )
+                        return False
+                    self.__logger.error(
+                        "Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id")
+                    )
+                    try:
+                        error_data = await response.json()
+                        self.__logger.error("Error details:")
+                        for original_error in error_data["detail"]:
+                            self.__logger.error(
+                                "  - %s (type: %s, location: %s)",
+                                original_error["msg"],
+                                original_error["type"],
+                                original_error["loc"],
                             )
                         self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
-                    except ValueError:
+                    except (ValueError, aiohttp.ContentTypeError):
                         self.__logger.error(
                             "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
                         )
                     return False
-                self.__logger.error(
-                    "Request error: %s, x-request-id: %s", response.status, response.headers.get("x-request-id")
-                )
-                try:
-                    error_data = await response.json()
-                    self.__logger.error("Error details:")
-                    for original_error in error_data["detail"]:
-                        self.__logger.error(
-                            "  - %s (type: %s, location: %s)",
-                            original_error["msg"],
-                            original_error["type"],
-                            original_error["loc"],
-                        )
-                    self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
-                except (ValueError, aiohttp.ContentTypeError):
-                    self.__logger.error(
-                        "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
-                    )
+            except aiohttp.ClientConnectorError:
+                self.__logger.error("Error: Connection to aBLT API couldn't be established, check URL: %s", url)
                 return False
 
     async def get_bots(self) -> list[dict]:
