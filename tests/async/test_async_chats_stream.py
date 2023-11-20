@@ -86,9 +86,8 @@ async def test_async_chats_stream_bot_selection_by_slug(api):
     :param api: api fixture (returns ABLTApi instance)
     """
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
-    async_generator = api.chat(
-        bot_slug=bot.slug, prompt="What is your name? Answer just one word (name).", max_words=MIN_WORDS, stream=True
-    )
+    prompt = f"What is your name? Answer just your name (full name, without greetings etc.). Use in {MIN_WORDS} max."
+    async_generator = api.chat(bot_slug=bot.slug, prompt=prompt, max_words=MIN_WORDS, stream=True)
     response = await get_full_response(async_generator)
     assert bot.name.replace(" Bot", "").replace(" Template", "").lower() in response.lower()
 
