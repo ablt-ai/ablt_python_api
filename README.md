@@ -13,7 +13,7 @@ At first, you need obtain aBLT API Token. You can do it [here](https://ablt.ai/)
 API wrapper is available on PyPI. You can install it with pip (recommended to use Python 3.9+):
 
 ```bash
-pip install ablt_python_api
+pip install ablt-python-api
 ```
 
 # Usage
