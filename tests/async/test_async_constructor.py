@@ -22,6 +22,7 @@ from src.ablt_python_api.ablt_api_async import ABLTApi
 from tests.test_data import sslcontext, KEY_LENGTH
 
 
+@pytest.mark.asyncio
 def test_async_constructor_without_token():
     """Test against constructor without token."""
     bearer_token = environ["ABLT_BEARER_TOKEN"]
@@ -31,6 +32,7 @@ def test_async_constructor_without_token():
     environ["ABLT_BEARER_TOKEN"] = bearer_token
 
 
+@pytest.mark.asyncio
 def test_async_constructor_with_env_token(caplog):
     """
     Test against constructor without token.
@@ -43,6 +45,7 @@ def test_async_constructor_with_env_token(caplog):
     assert "ABLT chat API is working like a charm" in caplog.text
 
 
+@pytest.mark.asyncio
 def test_async_constructor_default_init_with_any_token(caplog):
     """
     Test against constructor with any token.
@@ -55,6 +58,7 @@ def test_async_constructor_default_init_with_any_token(caplog):
     assert "ABLT chat API is working like a charm" in caplog.text
 
 
+@pytest.mark.asyncio
 def test_async_constructor_default_init_with_any_token_and_valid_url(caplog):
     """
     Test against constructor with any token and valid url.
@@ -67,6 +71,7 @@ def test_async_constructor_default_init_with_any_token_and_valid_url(caplog):
     assert "ABLT chat API is working like a charm" in caplog.text
 
 
+@pytest.mark.asyncio
 def test_async_constructor_default_init_with_invalid_url():
     """Test against constructor with invalid url."""
     with pytest.raises(client_exceptions.InvalidURL):
@@ -77,6 +82,7 @@ def test_async_constructor_default_init_with_invalid_url():
         )
 
 
+@pytest.mark.asyncio
 def test_async_constructor_default_init_with_incorrect_logger():
     """Test against constructor with incorrect logger."""
     with pytest.raises(AttributeError):
