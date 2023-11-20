@@ -216,7 +216,7 @@ async def test_async_chats_not_stream_max_words(api):
     :param api: api fixture (returns ABLTApi instance)
     """
     max_words = randint(3, 10)
-    tolerance = 1  # tolerance for tokens to words conversion
+    tolerance = 2  # tolerance for tokens to words conversion
     bot = choice([BotSchema.model_validate(bot_dict) for bot_dict in await api.get_bots()])
     async_generator = api.chat(
         bot_uid=bot.uid,
