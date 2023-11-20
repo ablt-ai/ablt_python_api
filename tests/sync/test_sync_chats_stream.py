@@ -153,7 +153,7 @@ def test_sync_chats_stream_use_messages(api):
     messages = choice(sample_messages)
     sync_generator = api.chat(bot_uid=bot.uid, messages=messages["message"], max_words=MIN_WORDS, stream=True)
     response = get_full_response(sync_generator)
-    assert messages["expected_answer"] in response
+    assert messages["expected_answer"] in response if response else False
 
 
 @pytest.mark.sync

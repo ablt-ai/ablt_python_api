@@ -11,13 +11,14 @@ Description:
 This file contains an implementation of class for sync aBLT chat API.
 """
 
-import requests
 import json
 import logging
 from datetime import datetime
 from os import environ
 from time import sleep
 from typing import Optional
+
+import requests
 
 from .utils.exceptions import DoneException
 from .utils.logger_config import setup_logger
@@ -119,32 +120,30 @@ class ABLTApi:
             response = session.get(url, headers=headers, verify=self.__ssl_verify)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
-            self.__logger.error(f"HTTP error occurred: {err}")
+            self.__logger.error("HTTP error occurred: %s", err)
             return False
         except requests.exceptions.MissingSchema as err:
-            self.__logger.error(f"Invalid URL: {err}")
+            self.__logger.error("Invalid URL: %s", err)
         except Exception as err:
-            self.__logger.error(f"Other error occurred: {err}")
+            self.__logger.error("Other error occurred: %s", err)
             return False
-        else:
-            data = response.json()
-            if data.get("status") == "ok":
-                self.__logger.info("ABLT chat API is working like a charm")
-                return True
-            else:
-                self.__logger.error("Error: %s", data.get("status"))
-                try:
-                    self.__logger.error("Error details:")
-                    for error in data["detail"]:
-                        self.__logger.error(
-                            "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
-                        )
-                    self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
-                except ValueError:
-                    self.__logger.error(
-                        "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
-                    )
-                return False
+        data = response.json()
+        if data.get("status") == "ok":
+            self.__logger.info("ABLT chat API is working like a charm")
+            return True
+        self.__logger.error("Error: %s", data.get("status"))
+        try:
+            self.__logger.error("Error details:")
+            for error in data["detail"]:
+                self.__logger.error(
+                    "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
+                )
+            self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
+        except ValueError:
+            self.__logger.error(
+                "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
+            )
+        return False
 
     def get_bots(self) -> list[dict]:
         """
@@ -160,10 +159,10 @@ class ABLTApi:
             response = session.get(url, headers=headers, verify=self.__ssl_verify)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
-            self.__logger.error(f"HTTP error occurred: {err}")
+            self.__logger.error("HTTP error occurred: %s", err)
             return []
         except Exception as err:
-            self.__logger.error(f"Other error occurred: {err}")
+            self.__logger.error("Other error occurred: %s", err)
             return []
         else:
             return response.json()
