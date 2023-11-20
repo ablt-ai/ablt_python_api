@@ -160,15 +160,19 @@ class ABLTApi:
         :rtype: list[dict]
         """
         url, headers = self.__get_url_and_headers("v1/bots")
+        response = None
         try:
             session = requests.session()
             session.verify = self.__ssl_verify
             response = session.get(url, headers=headers, verify=self.__ssl_verify)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
-            self.__logger.error(
-                "Request error: HTTP error occurred: %s, x-request-id: %s", err, response.headers.get("x-request-id")
-            )
+            if response:
+                self.__logger.error(
+                    "Request error: HTTP error occurred: %s, x-request-id: %s",
+                    err,
+                    response.headers.get("x-request-id"),
+                )
             return []
         return response.json()
 
