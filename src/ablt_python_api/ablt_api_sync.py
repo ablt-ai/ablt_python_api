@@ -8,13 +8,12 @@ Created: 20.11.2023
 Last Modified: 20.11.2023
 
 Description:
-This file contains an implementation of class for aBLT chat API.
+This file contains an implementation of class for sync aBLT chat API.
 """
 
 import requests
 import json
 import logging
-import ssl
 from datetime import datetime
 from os import environ
 from time import sleep
@@ -32,7 +31,7 @@ class ABLTApi:
         bearer_token: Optional[str] = None,
         base_api_url: str = "https://api.ablt.ai",
         logger: Optional[logging.Logger] = None,
-        ssl_context: Optional[ssl.SSLContext] = None,
+        ssl_verify: Optional[bool] = True,
     ):
         """
         Initializes the object with the provided base API URL and bearer token.
@@ -43,8 +42,8 @@ class ABLTApi:
         :type base_api_url: str
         :param logger: default logger.
         :type logger: logger
-        :param ssl_context: ssl context for aiohttp.
-        :type ssl_context: ssl.SSLContext
+        :param ssl_verify: ssl verification enabled or not.
+        :type ssl_verify: bool
 
         Raises:
             TypeError: If the bearer token is not provided.
@@ -57,7 +56,7 @@ class ABLTApi:
                 raise TypeError("Bearer token is required!")
         else:
             self.__bearer_token = bearer_token
-        self.__ssl_context = ssl_context
+        self.__ssl_verify = ssl_verify
         if logger:
             self.__logger = logger
         else:
@@ -115,11 +114,15 @@ class ABLTApi:
         """
         url, headers = self.__get_url_and_headers("health-check")
         try:
-            response = requests.get(url, headers=headers, verify=self.__ssl_context)
+            session = requests.session()
+            session.verify = self.__ssl_verify
+            response = session.get(url, headers=headers, verify=self.__ssl_verify)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             self.__logger.error(f"HTTP error occurred: {err}")
             return False
+        except requests.exceptions.MissingSchema as err:
+            self.__logger.error(f"Invalid URL: {err}")
         except Exception as err:
             self.__logger.error(f"Other error occurred: {err}")
             return False
@@ -152,7 +155,9 @@ class ABLTApi:
         """
         url, headers = self.__get_url_and_headers("v1/bots")
         try:
-            response = requests.get(url, headers=headers, verify=self.__ssl_context)
+            session = requests.session()
+            session.verify = self.__ssl_verify
+            response = session.get(url, headers=headers, verify=self.__ssl_verify)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             self.__logger.error(f"HTTP error occurred: {err}")
@@ -239,7 +244,9 @@ class ABLTApi:
             **({"use_search": use_search} if use_search is not None else {}),
         }
 
-        response = requests.post(url, headers=headers, json=payload, verify=self.__ssl_context)
+        session = requests.session()
+        session.verify = self.__ssl_verify
+        response = session.post(url, headers=headers, json=payload, verify=self.__ssl_verify)
         if response.status_code == 200:
             if stream:
                 for line in response.iter_lines():
@@ -299,7 +306,7 @@ class ABLTApi:
                 )
             return
 
-    async def update_api(self) -> None:
+    def update_api(self) -> None:
         """
         Updates the API by calling the health_check function.
 
@@ -309,7 +316,7 @@ class ABLTApi:
             ConnectionError: If the health_check function fails 10 times in a row.
         """
         retries = 0
-        while retries <= 10:
+        while retries < 10:
             if not self.health_check():
                 retries += 1
                 self.__logger.warning("WARNING: Seems something nasty happened with aBLT api, trying %s/10", retries)
@@ -319,7 +326,7 @@ class ABLTApi:
         if retries >= 10:
             raise ConnectionError("ERROR: Connection to aBLT API couldn't be established")
 
-    async def set_base_api_url(self, new_base_api_url: str, instant_update: bool = False):
+    def set_base_api_url(self, new_base_api_url: str, instant_update: bool = False):
         """
         Sets a new base API URL.
 
@@ -330,9 +337,9 @@ class ABLTApi:
         """
         self.__base_api_url = new_base_api_url
         if instant_update:
-            await self.update_api()
+            self.update_api()
 
-    async def set_bearer_token(self, new_bearer_token: str, instant_update: bool = False):
+    def set_bearer_token(self, new_bearer_token: str, instant_update: bool = False):
         """
         Sets a new bearer token.
 
@@ -343,9 +350,9 @@ class ABLTApi:
         """
         self.__bearer_token = new_bearer_token
         if instant_update:
-            await self.update_api()
+            self.update_api()
 
-    async def update_api_info(self, new_bearer_token: Optional[str] = None, new_base_api_url: Optional[str] = None):
+    def update_api_info(self, new_bearer_token: Optional[str] = None, new_base_api_url: Optional[str] = None):
         """
         Updates the API information with new bearer token and/or new base API URL.
 
@@ -357,12 +364,12 @@ class ABLTApi:
         - new_base_api_url (str): The new base API URL as a string, if any. Default is None.
         """
         if new_bearer_token:
-            await self.set_bearer_token(new_bearer_token)
+            self.set_bearer_token(new_bearer_token)
         if new_base_api_url:
-            await self.set_base_api_url(new_base_api_url)
-        await self.update_api()
+            self.set_base_api_url(new_base_api_url)
+        self.update_api()
 
-    async def find_bot_by_uid(self, bot_uid: str) -> Optional[dict]:
+    def find_bot_by_uid(self, bot_uid: str) -> Optional[dict]:
         """
         Searches for a bot by its id in the bot list.
 
@@ -376,7 +383,7 @@ class ABLTApi:
                 return bot_info
         return None
 
-    async def find_bot_by_slug(self, bot_slug: str) -> Optional[dict]:
+    def find_bot_by_slug(self, bot_slug: str) -> Optional[dict]:
         """
         Searches for a bot by its slug in the bot list.
 
@@ -390,7 +397,7 @@ class ABLTApi:
                 return bot_info
         return None
 
-    async def find_bot_by_name(self, bot_name: str) -> Optional[dict]:
+    def find_bot_by_name(self, bot_name: str) -> Optional[dict]:
         """
         Searches for a bot by its name in the bot list.
 
@@ -430,7 +437,9 @@ class ABLTApi:
         url, headers = self.__get_url_and_headers("v1/user/usage-statistics")
         payload = {"user_id": user_id, "start_date": start_date, "end_date": end_date}
 
-        response = requests.post(url, json=payload, headers=headers, verify=self.__ssl_context)
+        session = requests.session()
+        session.verify = self.__ssl_verify
+        response = session.post(url, json=payload, headers=headers, verify=self.__ssl_verify)
         if response.status_code == 200:
             return response.json()
         else:
@@ -448,7 +457,7 @@ class ABLTApi:
                 )
             return None
 
-    async def get_statistics_for_a_day(self, date: Optional[str] = None, user_id: Optional[int] = -1) -> Optional[dict]:
+    def get_statistics_for_a_day(self, date: Optional[str] = None, user_id: Optional[int] = -1) -> Optional[dict]:
         """
         Retrieves usage statistics for the API: only statistics for a day.
 
@@ -472,7 +481,7 @@ class ABLTApi:
                         return usage_info
         return None
 
-    async def get_statistics_total(
+    def get_statistics_total(
         self, user_id: Optional[int] = -1, start_date: Optional[str] = None, end_date: Optional[str] = None
     ) -> Optional[dict]:
         """

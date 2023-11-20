@@ -8,7 +8,7 @@ Created: 03.11.2023
 Last Modified: 17.11.2023
 
 Description:
-This file contains an implementation of class for aBLT chat API.
+This file contains an implementation of class for async aBLT chat API.
 """
 
 import asyncio
@@ -342,7 +342,7 @@ class ABLTApi:
             ConnectionError: If the health_check function fails 10 times in a row.
         """
         retries = 0
-        while retries <= 10:
+        while retries < 10:
             if not await self.health_check():
                 retries += 1
                 self.__logger.warning("WARNING: Seems something nasty happened with aBLT api, trying %s/10", retries)

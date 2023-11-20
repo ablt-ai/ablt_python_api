@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ablt_python_api"
-version = "0.0.1"
+version = "0.0.2"
 keywords = ["ablt", "api", "gpt", "chatbot"]
 authors = [
   { name="Iliya Vereshchagin", email="i.vereshchagin@gmail.com" },
@@ -98,6 +98,3 @@ extend-ignore = """
 
 [tool.pylint]
 max-line-length = 120
-
-[tool.pytest.ini_options]
-reruns = 2

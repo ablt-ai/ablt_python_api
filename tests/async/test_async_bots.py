@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 06.11.2023
-Last Modified: 06.11.2023
+Last Modified: 20.11.2023
 
 Description:
 This file tests for async bots.

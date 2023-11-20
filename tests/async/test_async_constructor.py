@@ -72,7 +72,7 @@ def test_async_constructor_default_init_with_invalid_url():
     with pytest.raises(client_exceptions.InvalidURL):
         ABLTApi(
             bearer_token=token_hex(KEY_LENGTH),
-            base_api_url=choice(("", token_hex(KEY_LENGTH))),
+            base_api_url=choice(("", f"https://{token_hex(KEY_LENGTH)}")),
             ssl_context=sslcontext,
         )
 
