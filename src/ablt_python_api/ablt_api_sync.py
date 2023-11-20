@@ -114,20 +114,30 @@ class ABLTApi:
         :rtype: bool
         """
         url, headers = self.__get_url_and_headers("health-check")
+        response = None
         try:
             session = requests.session()
             session.verify = self.__ssl_verify
             response = session.get(url, headers=headers, verify=self.__ssl_verify)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
-            self.__logger.error(
-                "Request error: HTTP error: %s, x-request-id: %", err, response.headers.get("x-request-id")
-            )
+            if response:
+                self.__logger.error(
+                    "Request error: HTTP error: %s, x-request-id: %s", err, response.headers.get("x-request-id")
+                )
+            return False
+        except requests.exceptions.ConnectionError as err:
+            if response:
+                self.__logger.error(
+                    "Request error: Connection error: %s, x-request-id: %s", err, response.headers.get("x-request-id")
+                )
             return False
         except requests.exceptions.MissingSchema as err:
-            self.__logger.error(
-                "Request error: Invalid URL: %s, x-request-id: %s", err, response.headers.get("x-request-id")
-            )
+            if response:
+                self.__logger.error(
+                    "Request error: Invalid URL: %s, x-request-id: %s", err, response.headers.get("x-request-id")
+                )
+            return False
         data = response.json()
         if data.get("status") == "ok":
             self.__logger.info("ABLT chat API is working like a charm")
@@ -441,13 +451,9 @@ class ABLTApi:
         )
         try:
             error_data = response.json()
-            self.__logger.error(
-                "Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id")
-            )
+            self.__logger.error("Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id"))
         except ValueError:
-            self.__logger.error(
-                "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
-            )
+            self.__logger.error("Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id"))
         return None
 
     def get_statistics_for_a_day(self, date: Optional[str] = None, user_id: Optional[int] = -1) -> Optional[dict]:
