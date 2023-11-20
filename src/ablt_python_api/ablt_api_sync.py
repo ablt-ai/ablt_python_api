@@ -120,13 +120,14 @@ class ABLTApi:
             response = session.get(url, headers=headers, verify=self.__ssl_verify)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
-            self.__logger.error("HTTP error occurred: %s", err)
+            self.__logger.error(
+                "Request error: HTTP error: %s, x-request-id: %", err, response.headers.get("x-request-id")
+            )
             return False
         except requests.exceptions.MissingSchema as err:
-            self.__logger.error("Invalid URL: %s", err)
-        except Exception as err:
-            self.__logger.error("Other error occurred: %s", err)
-            return False
+            self.__logger.error(
+                "Request error: Invalid URL: %s, x-request-id: %s", err, response.headers.get("x-request-id")
+            )
         data = response.json()
         if data.get("status") == "ok":
             self.__logger.info("ABLT chat API is working like a charm")
@@ -135,14 +136,10 @@ class ABLTApi:
         try:
             self.__logger.error("Error details:")
             for error in data["detail"]:
-                self.__logger.error(
-                    "  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"]
-                )
+                self.__logger.error("  - %s (type: %s, location: %s)", error["msg"], error["type"], error["loc"])
             self.__logger.error("  - x-request-id: %s", response.headers.get("x-request-id"))
         except ValueError:
-            self.__logger.error(
-                "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
-            )
+            self.__logger.error("Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id"))
         return False
 
     def get_bots(self) -> list[dict]:
@@ -159,27 +156,25 @@ class ABLTApi:
             response = session.get(url, headers=headers, verify=self.__ssl_verify)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
-            self.__logger.error("HTTP error occurred: %s", err)
+            self.__logger.error(
+                "Request error: HTTP error occurred: %s, x-request-id: %s", err, response.headers.get("x-request-id")
+            )
             return []
-        except Exception as err:
-            self.__logger.error("Other error occurred: %s", err)
-            return []
-        else:
-            return response.json()
+        return response.json()
 
-    # pylint: disable=R0914,R0912,R0915
+    # pylint: disable=R0914,R0912,R0915,R1702
     def chat(
-            self,
-            bot_uid: Optional[str] = None,
-            bot_slug: Optional[str] = None,
-            prompt: Optional[str] = None,
-            messages: Optional[list] = None,
-            stream: Optional[bool] = False,
-            user_id: Optional[int] = None,
-            language: Optional[str] = None,
-            assumptions: Optional[dict] = None,
-            max_words: Optional[int] = None,
-            use_search: Optional[bool] = False,
+        self,
+        bot_uid: Optional[str] = None,
+        bot_slug: Optional[str] = None,
+        prompt: Optional[str] = None,
+        messages: Optional[list] = None,
+        stream: Optional[bool] = False,
+        user_id: Optional[int] = None,
+        language: Optional[str] = None,
+        assumptions: Optional[dict] = None,
+        max_words: Optional[int] = None,
+        use_search: Optional[bool] = False,
     ):
         """
         Sends a chat request to the API and returns the response.
@@ -411,10 +406,10 @@ class ABLTApi:
         return None
 
     def get_usage_statistics(
-            self,
-            user_id: Optional[int] = -1,
-            start_date: Optional[str] = None,
-            end_date: Optional[str] = None,
+        self,
+        user_id: Optional[int] = -1,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> Optional[dict]:
         """
         Retrieves usage statistics for the API.
@@ -441,20 +436,19 @@ class ABLTApi:
         response = session.post(url, json=payload, headers=headers, verify=self.__ssl_verify)
         if response.status_code == 200:
             return response.json()
-        else:
+        self.__logger.error(
+            "Request error: %s, x-request-id: %s", response.status_code, response.headers.get("x-request-id")
+        )
+        try:
+            error_data = response.json()
             self.__logger.error(
-                "Request error: %s, x-request-id: %s", response.status_code, response.headers.get("x-request-id")
+                "Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id")
             )
-            try:
-                error_data = response.json()
-                self.__logger.error(
-                    "Error details: %s, x-request-id: %s", error_data, response.headers.get("x-request-id")
-                )
-            except ValueError:
-                self.__logger.error(
-                    "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
-                )
-            return None
+        except ValueError:
+            self.__logger.error(
+                "Error text: %s, x-request-id: %s", response.text, response.headers.get("x-request-id")
+            )
+        return None
 
     def get_statistics_for_a_day(self, date: Optional[str] = None, user_id: Optional[int] = -1) -> Optional[dict]:
         """
