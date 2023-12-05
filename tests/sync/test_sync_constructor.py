@@ -51,7 +51,9 @@ def test_sync_constructor_default_init_with_any_token(caplog):
     :param caplog: caplog pytest fixture
     """
     caplog.set_level(INFO)
-    ABLTApi(bearer_token=token_hex(KEY_LENGTH), )
+    ABLTApi(
+        bearer_token=token_hex(KEY_LENGTH),
+    )
     assert "Logger for API now launched!" in caplog.text
     assert "ABLT chat API is working like a charm" in caplog.text
 
@@ -64,7 +66,10 @@ def test_sync_constructor_default_init_with_any_token_and_valid_url(caplog):
     :param caplog: caplog pytest fixture
     """
     caplog.set_level(INFO)
-    ABLTApi(bearer_token=token_hex(KEY_LENGTH), base_api_url="https://api.ablt.ai", )
+    ABLTApi(
+        bearer_token=token_hex(KEY_LENGTH),
+        base_api_url="https://api.ablt.ai",
+    )
     assert "Logger for API now launched!" in caplog.text
     assert "ABLT chat API is working like a charm" in caplog.text
 
@@ -95,4 +100,7 @@ def test_sync_constructor_default_init_with_empty_url():
 def test_sync_constructor_default_init_with_incorrect_logger():
     """Test against constructor with incorrect logger."""
     with pytest.raises(AttributeError):
-        ABLTApi(bearer_token=token_hex(KEY_LENGTH), logger=token_hex(KEY_LENGTH), )
+        ABLTApi(
+            bearer_token=token_hex(KEY_LENGTH),
+            logger=token_hex(KEY_LENGTH),
+        )
