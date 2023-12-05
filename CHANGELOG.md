@@ -16,3 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - aBLT sync API
 - added few tests to cover the sync API
+
+## [0.0.3] - 2023-12-05
+
+### Changed
+- SSL certificate check in tests is now enabled

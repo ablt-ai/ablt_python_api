@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 20.11.2023
-Last Modified: 20.11.2023
+Last Modified: 05.12.2023
 
 Description:
 This file contains pytest fixtures for sync API.
@@ -29,7 +29,7 @@ def api():
     :return: ABLTApi instance
     :rtype: ABLTApi
     """
-    return ABLTApi(bearer_token=environ["ABLT_BEARER_TOKEN"], ssl_verify=False)
+    return ABLTApi(bearer_token=environ["ABLT_BEARER_TOKEN"])
 
 
 @pytest.fixture()
