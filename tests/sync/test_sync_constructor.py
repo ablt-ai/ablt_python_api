@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 20.11.2023
-Last Modified: 20.11.2023
+Last Modified: 05.12.2023
 
 Description:
 This file tests for sync constructor.
@@ -26,7 +26,7 @@ def test_sync_constructor_without_token():
     bearer_token = environ["ABLT_BEARER_TOKEN"]
     environ["ABLT_BEARER_TOKEN"] = ""
     with pytest.raises(TypeError):
-        ABLTApi(ssl_verify=False)
+        ABLTApi()
     environ["ABLT_BEARER_TOKEN"] = bearer_token
 
 
@@ -38,7 +38,7 @@ def test_sync_constructor_with_env_token(caplog):
     :param caplog: caplog pytest fixture
     """
     caplog.set_level(INFO)
-    ABLTApi(ssl_verify=False)
+    ABLTApi()
     assert "Logger for API now launched!" in caplog.text
     assert "ABLT chat API is working like a charm" in caplog.text
 
@@ -51,7 +51,7 @@ def test_sync_constructor_default_init_with_any_token(caplog):
     :param caplog: caplog pytest fixture
     """
     caplog.set_level(INFO)
-    ABLTApi(bearer_token=token_hex(KEY_LENGTH), ssl_verify=False)
+    ABLTApi(bearer_token=token_hex(KEY_LENGTH), )
     assert "Logger for API now launched!" in caplog.text
     assert "ABLT chat API is working like a charm" in caplog.text
 
@@ -64,7 +64,7 @@ def test_sync_constructor_default_init_with_any_token_and_valid_url(caplog):
     :param caplog: caplog pytest fixture
     """
     caplog.set_level(INFO)
-    ABLTApi(bearer_token=token_hex(KEY_LENGTH), base_api_url="https://api.ablt.ai", ssl_verify=False)
+    ABLTApi(bearer_token=token_hex(KEY_LENGTH), base_api_url="https://api.ablt.ai", )
     assert "Logger for API now launched!" in caplog.text
     assert "ABLT chat API is working like a charm" in caplog.text
 
@@ -76,7 +76,6 @@ def test_sync_constructor_default_init_with_invalid_url():
         ABLTApi(
             bearer_token=token_hex(KEY_LENGTH),
             base_api_url=f"https://{token_hex(KEY_LENGTH)}",
-            ssl_verify=False,
         )
 
 
@@ -88,7 +87,6 @@ def test_sync_constructor_default_init_with_empty_url():
         ABLTApi(
             bearer_token=token_hex(KEY_LENGTH),
             base_api_url="",
-            ssl_verify=False,
         )
 
 
@@ -97,4 +95,4 @@ def test_sync_constructor_default_init_with_empty_url():
 def test_sync_constructor_default_init_with_incorrect_logger():
     """Test against constructor with incorrect logger."""
     with pytest.raises(AttributeError):
-        ABLTApi(bearer_token=token_hex(KEY_LENGTH), logger=token_hex(KEY_LENGTH), ssl_verify=False)
+        ABLTApi(bearer_token=token_hex(KEY_LENGTH), logger=token_hex(KEY_LENGTH), )
