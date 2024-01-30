@@ -1,5 +1,5 @@
-aiohttp==3.9.1
+aiohttp==3.9.3
 asyncio==3.4.3
 requests==2.31.0
-pydantic==2.5.2
+pydantic==2.6.0
 pytest-rerunfailures==13.0

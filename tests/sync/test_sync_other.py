@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 20.11.2023
-Last Modified: 20.11.2023
+Last Modified: 30.01.2024
 
 Description:
 This file tests for sync other helper stuff.
@@ -18,7 +18,7 @@ import pytest
 from src.ablt_python_api.ablt_api_sync import ABLTApi
 from tests.test_data import KEY_LENGTH
 
-test_api = ABLTApi(bearer_token=token_hex(KEY_LENGTH), ssl_verify=False)
+test_api = ABLTApi(bearer_token=token_hex(KEY_LENGTH))
 
 
 @pytest.mark.sync
