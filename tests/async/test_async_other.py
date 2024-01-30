@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 06.11.2023
-Last Modified: 06.11.2023
+Last Modified: 30.01.2024
 
 Description:
 This file tests for async other helper stuff.
@@ -17,10 +17,10 @@ import pytest
 from aiohttp import client_exceptions
 
 from src.ablt_python_api.ablt_api_async import ABLTApi
-from tests.test_data import KEY_LENGTH, sslcontext
+from tests.test_data import KEY_LENGTH
 
 
-test_api = ABLTApi(bearer_token=token_hex(KEY_LENGTH), ssl_context=sslcontext)
+test_api = ABLTApi(bearer_token=token_hex(KEY_LENGTH))
 
 
 @pytest.mark.asyncio

@@ -21,3 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - SSL certificate check in tests is now enabled
+
+## [0.0.4] - 2024-01-30
+
+### Changed
+- GitHub Actions (Python actions bumped to 5)
+- Remove disabled SSL certificate check in tests
