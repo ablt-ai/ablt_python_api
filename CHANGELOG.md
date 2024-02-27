@@ -27,3 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - GitHub Actions (Python actions bumped to 5)
 - Remove disabled SSL certificate check in tests
+
+## [0.0.5] - 2024-02-27
+
+### Changed
+- Bump requirements.txt to latest versions
