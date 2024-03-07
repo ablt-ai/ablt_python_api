@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ablt_python_api"
-version = "0.0.4"
+version = "0.0.5"
 keywords = ["ablt", "api", "gpt", "chatbot"]
 authors = [
   { name="Iliya Vereshchagin", email="iliya.vereshchagin@ablt.ai" },
