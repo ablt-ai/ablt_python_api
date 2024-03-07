@@ -7,5 +7,9 @@
 ### Documentation
 - [ ] Documentation / README.md has been updated
 
+### Tests
+- [ ] Tests have been added to cover the changes
+- [ ] All tests passed
+
 ### Other code changes
 - [ ] The soul is pure

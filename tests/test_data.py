@@ -76,7 +76,7 @@ ensured_bots = (
         "model": "gpt-4",
         "name": "Omni",
         "description": "An omniscient bot with knowledge of everything",
-        "welcome_message": "Hi, I'm Omni. \n\nHow can I help you today?",
+        "welcome_message": "Hi, I'm Omni. \r\n\r\nHow can I help you today?",
         "avatar_url": "https://strapi-ablt.s3.amazonaws.com/thumbnail_omni_bdf1a23d4e.jpg",
     },
     {
