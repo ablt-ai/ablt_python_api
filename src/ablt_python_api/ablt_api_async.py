@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 17.11.2023
+Last Modified: 21.08.2023
 
 Description:
 This file contains an implementation of class for async aBLT chat API.
@@ -14,7 +14,6 @@ This file contains an implementation of class for async aBLT chat API.
 import asyncio
 import json
 import logging
-import ssl
 from datetime import datetime
 from os import environ
 from time import sleep
@@ -34,7 +33,6 @@ class ABLTApi:
         bearer_token: Optional[str] = None,
         base_api_url: str = "https://api.ablt.ai",
         logger: Optional[logging.Logger] = None,
-        ssl_context: Optional[ssl.SSLContext] = None,
     ):
         """
         Initializes the object with the provided base API URL and bearer token.
@@ -45,8 +43,6 @@ class ABLTApi:
         :type base_api_url: str
         :param logger: default logger.
         :type logger: logger
-        :param ssl_context: ssl context for aiohttp.
-        :type ssl_context: ssl.SSLContext
 
         Raises:
             TypeError: If the bearer token is not provided.
@@ -59,7 +55,6 @@ class ABLTApi:
                 raise TypeError("Bearer token is required!")
         else:
             self.__bearer_token = bearer_token
-        self.__ssl_context = ssl_context
         if logger:
             self.__logger = logger
         else:
@@ -128,7 +123,7 @@ class ABLTApi:
         url, headers = self.__get_url_and_headers("health-check")
         async with aiohttp.ClientSession() as session:
             try:
-                async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
+                async with session.get(url, headers=headers) as response:
                     if response.status == 200:
                         data = await response.json()
                         if data.get("status") == "ok":
@@ -179,7 +174,7 @@ class ABLTApi:
         """
         url, headers = self.__get_url_and_headers("v1/bots")
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, ssl=self.__ssl_context) as response:
+            async with session.get(url, headers=headers) as response:
                 if response.status == 200:
                     return await response.json()
                 self.__logger.error(
@@ -273,7 +268,7 @@ class ABLTApi:
         }
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, json=payload, ssl=self.__ssl_context) as response:
+            async with session.post(url, headers=headers, json=payload) as response:
                 if response.status == 200:
                     if stream:
                         try:
@@ -467,7 +462,7 @@ class ABLTApi:
         url, headers = self.__get_url_and_headers("v1/user/usage-statistics")
         payload = {"user_id": user_id, "start_date": start_date, "end_date": end_date}
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, json=payload, headers=headers, ssl=self.__ssl_context) as response:
+            async with session.post(url, json=payload, headers=headers) as response:
                 if response.status == 200:
                     return await response.json()
                 self.__logger.error(
