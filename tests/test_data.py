@@ -5,21 +5,17 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 03.11.2023
-Last Modified: 17.11.2023
+Last Modified: 21.08.2024
 
 Description:
 This file contains data for tests.
 """
-import ssl
+
 from datetime import datetime
 from random import randint, choice
 from secrets import token_hex
 from typing import List, Dict, Tuple
 
-# Certificates
-sslcontext = ssl.create_default_context()
-sslcontext.check_hostname = False
-sslcontext.verify_mode = ssl.CERT_NONE
 
 # Constants
 KEY_LENGTH = randint(8, 32)

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ablt_python_api"
-version = "0.0.5"
+version = "0.0.6"
 keywords = ["ablt", "api", "gpt", "chatbot"]
 authors = [
   { name="Iliya Vereshchagin", email="iliya.vereshchagin@ablt.ai" },
@@ -26,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",

@@ -239,22 +239,6 @@ statistics = StatisticTotalSchema.model_validate(api.get_usage_statistics_for_da
 
 You can always [contact support](mailto:contact@aBLT.ai) or contact us in [Discord channel](https://discord.com/channels/1097998898506760392/1104055996302766120).
 
-## SSL errors
-
-In some cases, you may be experienced with SSL errors, then you may disable certificate verification:
-
-```python
-import ssl
-
-
-sslcontext = ssl.create_default_context()
-sslcontext.check_hostname = False
-sslcontext.verify_mode = ssl.CERT_NONE
-
-ABLTApi_async(ssl_context=sslcontext)  # for async
-ABLTApl(ssl_verify=False)  # for sync
-```
-
 ## Rate limit errors
 
 Never try to flood API with requests, because you may be experienced with rate limit errors. In this case, you need to wait for some time and retry your request. Especially, never try to flood API with simultaneous requests for more users than allowed in your plan.
