@@ -5,7 +5,7 @@ Author: Iliya Vereshchagin
 Copyright (c) 2023 aBLT.ai. All rights reserved.
 
 Created: 20.11.2023
-Last Modified: 20.11.2023
+Last Modified: 21.08.2024
 
 Description:
 This file contains an implementation of class for sync aBLT chat API.
@@ -32,7 +32,6 @@ class ABLTApi:
         bearer_token: Optional[str] = None,
         base_api_url: str = "https://api.ablt.ai",
         logger: Optional[logging.Logger] = None,
-        ssl_verify: Optional[bool] = True,
     ):
         """
         Initializes the object with the provided base API URL and bearer token.
@@ -43,8 +42,6 @@ class ABLTApi:
         :type base_api_url: str
         :param logger: default logger.
         :type logger: logger
-        :param ssl_verify: ssl verification enabled or not.
-        :type ssl_verify: bool
 
         Raises:
             TypeError: If the bearer token is not provided.
@@ -57,7 +54,6 @@ class ABLTApi:
                 raise TypeError("Bearer token is required!")
         else:
             self.__bearer_token = bearer_token
-        self.__ssl_verify = ssl_verify
         if logger:
             self.__logger = logger
         else:
@@ -117,8 +113,7 @@ class ABLTApi:
         response = None
         try:
             session = requests.session()
-            session.verify = self.__ssl_verify
-            response = session.get(url, headers=headers, verify=self.__ssl_verify)
+            response = session.get(url, headers=headers)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             if response:
@@ -163,8 +158,7 @@ class ABLTApi:
         response = None
         try:
             session = requests.session()
-            session.verify = self.__ssl_verify
-            response = session.get(url, headers=headers, verify=self.__ssl_verify)
+            response = session.get(url, headers=headers)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             if response:
@@ -253,8 +247,7 @@ class ABLTApi:
         }
 
         session = requests.session()
-        session.verify = self.__ssl_verify
-        response = session.post(url, headers=headers, json=payload, verify=self.__ssl_verify)
+        response = session.post(url, headers=headers, json=payload)
         if response.status_code == 200:
             if stream:
                 for line in response.iter_lines():
@@ -446,8 +439,7 @@ class ABLTApi:
         payload = {"user_id": user_id, "start_date": start_date, "end_date": end_date}
 
         session = requests.session()
-        session.verify = self.__ssl_verify
-        response = session.post(url, json=payload, headers=headers, verify=self.__ssl_verify)
+        response = session.post(url, json=payload, headers=headers)
         if response.status_code == 200:
             return response.json()
         self.__logger.error(

@@ -1,4 +1,4 @@
-aiohttp==3.10.0
-asyncio==3.4.3
-requests==2.32.3
-pydantic==2.8.2
+aiohttp
+asyncio
+requests
+pydantic
