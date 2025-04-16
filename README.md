@@ -2,6 +2,9 @@
 
 [![PyPI version](https://badge.fury.io/py/ablt-python-api.svg)](https://badge.fury.io/py/ablt-python-api) [![Linters](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_linters.yml/badge.svg?branch=master)](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_linters.yml) [![Tests](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_tests.yml/badge.svg?branch=master)](https://github.com/ablt-ai/ablt_python_api/actions/workflows/master_tests.yml) ![PyPI - License](https://img.shields.io/pypi/l/ablt-python-api) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ablt-python-api)[![Downloads](https://static.pepy.tech/badge/ablt-python-api)](https://pepy.tech/project/ablt-python-api) [![Downloads](https://static.pepy.tech/badge/ablt-python-api/month)](https://pepy.tech/project/ablt-python-api)
 
+# ⚠️ Project Status Notice
+This project is no longer under active development or maintenance due to public API service is down. The repository will remain available for reference, but no further updates or support will be provided.
+
 # About
 
 This is Python aBLT API wrapper. It is used to communicate with aBLT API. You may use it to create your own aBLT client using asynchronous or synchronous Python. You can find more information about aBLT API [here](https://docs.ablt.ai/api_docs/overview).

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ablt_python_api"
-version = "0.0.6"
+version = "0.0.7"
 keywords = ["ablt", "api", "gpt", "chatbot"]
 authors = [
   { name="Iliya Vereshchagin", email="iliya.vereshchagin@ablt.ai" },
@@ -22,11 +22,13 @@ dependencies = [
     'asyncio',
     'pydantic'
 ]
+
 classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
@@ -36,13 +38,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Human Machine Interfaces",
 ]
 
-install_requires = [
-    'requests',
-    'aiohttp',
-    'aiofiles',
-    'asyncio',
-    'requests',
-]
 
 [project.urls]
 "Homepage" = "https://docs.ablt.ai/api_docs/overview"
